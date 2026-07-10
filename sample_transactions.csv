@@ -1,0 +1,1418 @@
+Date,Description,Merchant,Amount,Category
+01-01-2026,Local Cafe 01 Jan,Local Cafe,161.0,Food & Dining
+01-01-2026,Subway 01 Jan,Subway,222.0,Food & Dining
+01-01-2026,McDonalds 01 Jan,McDonalds,270.0,Food & Dining
+01-01-2026,Subway 01 Jan,Subway,305.0,Food & Dining
+01-01-2026,Netflix Monthly,Netflix,1259.0,Subscriptions
+01-01-2026,Amazon Prime Monthly,Amazon Prime,1137.0,Subscriptions
+01-02-2026,Water Bill 01 Feb,Water Bill,501.0,Bills & Utilities
+01-02-2026,Burger King 01 Feb,Burger King,295.0,Food & Dining
+01-02-2026,Jio Recharge 01 Feb,Jio Recharge,545.0,Bills & Utilities
+01-02-2026,Local Store 01 Feb,Local Store,252.0,Shopping
+01-02-2026,Burger King 01 Feb,Burger King,799.0,Food & Dining
+01-02-2026,IKEA 01 Feb,IKEA,1725.0,Shopping
+01-02-2026,Pizza Hut 01 Feb,Pizza Hut,613.0,Food & Dining
+01-02-2026,Gym Membership Monthly,Gym Membership,1967.0,Subscriptions
+01-02-2026,Health Checkup 01 Feb,Health Checkup,4472.0,Healthcare
+01-02-2026,ATM Fee 01 Feb,ATM Fee,27.0,Other
+01-02-2026,Steam 01 Feb,Steam,610.0,Entertainment
+01-02-2026,Society Maintenance 01 Feb,Society Maintenance,1825.0,Bills & Utilities
+01-02-2026,Zomato 01 Feb,Zomato,279.0,Food & Dining
+01-03-2026,Zomato 01 Mar,Zomato,782.0,Food & Dining
+01-03-2026,Amazon Prime Monthly,Amazon Prime,1202.0,Subscriptions
+01-03-2026,Uber 01 Mar,Uber,172.0,Transport
+01-03-2026,Uber 01 Mar,Uber,192.0,Transport
+01-03-2026,Broadband Bill 01 Mar,Broadband Bill,1480.0,Bills & Utilities
+01-03-2026,Dominos 01 Mar,Dominos,374.0,Food & Dining
+01-03-2026,Reliance Fresh 01 Mar,Reliance Fresh,1561.0,Groceries
+01-03-2026,Spotify 01 Mar,Spotify,172.0,Subscriptions
+01-03-2026,Random 01 Mar,Random,326.0,Other
+01-03-2026,Steam 01 Mar,Steam,2446.0,Entertainment
+01-03-2026,Rent Transfer 01 Mar,Rent Transfer,5266.0,Transfers
+01-03-2026,Burger King 01 Mar,Burger King,774.0,Food & Dining
+01-04-2026,Amazon Prime Monthly,Amazon Prime,1491.0,Subscriptions
+01-04-2026,Burger King 01 Apr,Burger King,435.0,Food & Dining
+01-04-2026,Zomato 01 Apr,Zomato,436.0,Food & Dining
+01-04-2026,Zomato Dining 01 Apr,Zomato Dining,772.0,Entertainment
+01-04-2026,Jio Recharge 01 Apr,Jio Recharge,594.0,Bills & Utilities
+01-04-2026,Local Cafe 01 Apr,Local Cafe,281.0,Food & Dining
+01-04-2026,FD Deposit 01 Apr,FD Deposit,9044.0,Transfers
+01-04-2026,Local Cafe 01 Apr,Local Cafe,216.0,Food & Dining
+01-05-2026,iCloud Monthly,iCloud,98.0,Subscriptions
+01-05-2026,Local Cafe 01 May,Local Cafe,335.0,Food & Dining
+01-05-2026,Blinkit 01 May,Blinkit,1310.0,Groceries
+01-05-2026,Doctor Visit 01 May,Doctor Visit,1622.0,Healthcare
+01-05-2026,Burger King 01 May,Burger King,345.0,Food & Dining
+01-05-2026,McDonalds 01 May,McDonalds,294.0,Food & Dining
+01-05-2026,Decathlon 01 May,Decathlon,3471.0,Shopping
+01-05-2026,Indian Oil 01 May,Indian Oil,2737.0,Transport
+01-06-2026,Local Grocer 01 Jun,Local Grocer,552.0,Groceries
+01-06-2026,Cash Withdrawal 01 Jun,Cash Withdrawal,4269.0,Other
+01-06-2026,Hotstar Monthly,Hotstar,755.0,Subscriptions
+01-06-2026,Google One Monthly,Google One,406.0,Subscriptions
+01-06-2026,Subway 01 Jun,Subway,416.0,Food & Dining
+01-06-2026,Blinkit 01 Jun,Blinkit,540.0,Groceries
+01-06-2026,Zomato 01 Jun,Zomato,502.0,Food & Dining
+01-06-2026,IKEA 01 Jun,IKEA,1380.0,Shopping
+01-06-2026,BookMyShow 01 Jun,BookMyShow,301.0,Entertainment
+02-01-2026,McDonalds 02 Jan,McDonalds,487.0,Food & Dining
+02-01-2026,Zomato 02 Jan,Zomato,379.0,Food & Dining
+02-01-2026,Swiggy 02 Jan,Swiggy,478.0,Food & Dining
+02-01-2026,Random 02 Jan,Random,132.0,Other
+02-01-2026,IKEA 02 Jan,IKEA,5041.0,Shopping
+02-01-2026,Local Store 02 Jan,Local Store,1973.0,Shopping
+02-01-2026,Local Cafe 02 Jan,Local Cafe,213.0,Food & Dining
+02-01-2026,Blinkit 02 Jan,Blinkit,1071.0,Groceries
+02-02-2026,Burger King 02 Feb,Burger King,311.0,Food & Dining
+02-02-2026,Society Maintenance 02 Feb,Society Maintenance,2139.0,Bills & Utilities
+02-02-2026,Swiggy 02 Feb,Swiggy,153.0,Food & Dining
+02-02-2026,Pizza Hut 02 Feb,Pizza Hut,663.0,Food & Dining
+02-02-2026,Subway 02 Feb,Subway,228.0,Food & Dining
+02-02-2026,Nykaa 02 Feb,Nykaa,1332.0,Shopping
+02-02-2026,Swiggy 02 Feb,Swiggy,453.0,Food & Dining
+02-02-2026,Broadband Bill 02 Feb,Broadband Bill,1137.0,Bills & Utilities
+02-03-2026,Broadband Bill 02 Mar,Broadband Bill,957.0,Bills & Utilities
+02-03-2026,Nykaa 02 Mar,Nykaa,1134.0,Shopping
+02-03-2026,Mutual Fund 02 Mar,Mutual Fund,5344.0,Transfers
+02-03-2026,FD Deposit 02 Mar,FD Deposit,25354.0,Transfers
+02-03-2026,FD Deposit 02 Mar,FD Deposit,4124.0,Transfers
+02-03-2026,Burger King 02 Mar,Burger King,499.0,Food & Dining
+02-03-2026,Misc Expense 02 Mar,Misc Expense,526.0,Other
+02-03-2026,McDonalds 02 Mar,McDonalds,452.0,Food & Dining
+02-03-2026,Jio Recharge 02 Mar,Jio Recharge,858.0,Bills & Utilities
+02-04-2026,Subway 02 Apr,Subway,250.0,Food & Dining
+02-04-2026,Blinkit 02 Apr,Blinkit,607.0,Groceries
+02-04-2026,Local Grocer 02 Apr,Local Grocer,344.0,Groceries
+02-04-2026,DMart 02 Apr,DMart,3211.0,Groceries
+02-04-2026,Decathlon 02 Apr,Decathlon,1912.0,Shopping
+02-04-2026,Airtel Recharge 02 Apr,Airtel Recharge,849.0,Bills & Utilities
+02-04-2026,BPCL 02 Apr,BPCL,2094.0,Transport
+02-04-2026,Rent Transfer 02 Apr,Rent Transfer,22480.0,Transfers
+02-05-2026,Uber 02 May,Uber,408.0,Transport
+02-05-2026,Misc Expense 02 May,Misc Expense,299.0,Other
+02-05-2026,Decathlon 02 May,Decathlon,1583.0,Shopping
+02-05-2026,Dosa Plaza 02 May,Dosa Plaza,404.0,Food & Dining
+02-05-2026,Dominos 02 May,Dominos,418.0,Food & Dining
+02-05-2026,Uber Pool 02 May,Uber Pool,187.0,Transport
+02-05-2026,Zomato 02 May,Zomato,576.0,Food & Dining
+02-05-2026,Local Store 02 May,Local Store,1836.0,Shopping
+02-05-2026,Metro Card 02 May,Metro Card,68.0,Transport
+02-06-2026,Zomato 02 Jun,Zomato,328.0,Food & Dining
+02-06-2026,Reliance Fresh 02 Jun,Reliance Fresh,1682.0,Groceries
+02-06-2026,Netflix 02 Jun,Netflix,596.0,Subscriptions
+02-06-2026,Zomato 02 Jun,Zomato,543.0,Food & Dining
+02-06-2026,Swiggy 02 Jun,Swiggy,524.0,Food & Dining
+02-06-2026,Local Grocer 02 Jun,Local Grocer,995.0,Groceries
+02-06-2026,Rent Payment 02 Jun,Rent Payment,12111.0,Bills & Utilities
+02-06-2026,Pizza Hut 02 Jun,Pizza Hut,591.0,Food & Dining
+02-06-2026,Indian Oil 02 Jun,Indian Oil,2061.0,Transport
+03-01-2026,Netflix 03 Jan,Netflix,728.0,Subscriptions
+03-01-2026,Burger King 03 Jan,Burger King,425.0,Food & Dining
+03-01-2026,Dominos 03 Jan,Dominos,759.0,Food & Dining
+03-01-2026,Zomato 03 Jan,Zomato,330.0,Food & Dining
+03-01-2026,Airtel Recharge 03 Jan,Airtel Recharge,928.0,Bills & Utilities
+03-01-2026,McDonalds 03 Jan,McDonalds,610.0,Food & Dining
+03-01-2026,Decathlon 03 Jan,Decathlon,3596.0,Shopping
+03-01-2026,Zepto 03 Jan,Zepto,360.0,Groceries
+03-02-2026,Gym Membership 03 Feb,Gym Membership,1632.0,Subscriptions
+03-02-2026,Dosa Plaza 03 Feb,Dosa Plaza,151.0,Food & Dining
+03-02-2026,Zomato 03 Feb,Zomato,631.0,Food & Dining
+03-02-2026,Parking 03 Feb,Parking,26.0,Transport
+03-02-2026,Reliance Fresh 03 Feb,Reliance Fresh,1500.0,Groceries
+03-02-2026,Local Grocer 03 Feb,Local Grocer,534.0,Groceries
+03-03-2026,Dosa Plaza 03 Mar,Dosa Plaza,220.0,Food & Dining
+03-03-2026,Big Basket 03 Mar,Big Basket,637.0,Groceries
+03-03-2026,Zepto 03 Mar,Zepto,392.0,Groceries
+03-03-2026,DMart 03 Mar,DMart,2298.0,Groceries
+03-03-2026,Zepto 03 Mar,Zepto,672.0,Groceries
+03-03-2026,Local Cafe 03 Mar,Local Cafe,167.0,Food & Dining
+03-03-2026,Local Cafe 03 Mar,Local Cafe,205.0,Food & Dining
+03-03-2026,Local Cafe 03 Mar,Local Cafe,336.0,Food & Dining
+03-03-2026,Credit Card Payment 03 Mar,Credit Card Payment,9650.0,Transfers
+03-04-2026,Dominos 03 Apr,Dominos,406.0,Food & Dining
+03-04-2026,BPCL 03 Apr,BPCL,1080.0,Transport
+03-04-2026,Local Grocer 03 Apr,Local Grocer,996.0,Groceries
+03-04-2026,Mutual Fund 03 Apr,Mutual Fund,15100.0,Transfers
+03-04-2026,Dosa Plaza 03 Apr,Dosa Plaza,176.0,Food & Dining
+03-04-2026,Metro Card 03 Apr,Metro Card,42.0,Transport
+03-05-2026,Swiggy 03 May,Swiggy,561.0,Food & Dining
+03-05-2026,Mutual Fund 03 May,Mutual Fund,2276.0,Transfers
+03-05-2026,Zepto 03 May,Zepto,371.0,Groceries
+03-05-2026,Broadband Bill 03 May,Broadband Bill,1327.0,Bills & Utilities
+03-05-2026,Google One 03 May,Google One,199.0,Subscriptions
+03-05-2026,Zomato 03 May,Zomato,741.0,Food & Dining
+03-05-2026,Uber 03 May,Uber,406.0,Transport
+03-05-2026,Subway 03 May,Subway,204.0,Food & Dining
+03-05-2026,Big Basket 03 May,Big Basket,1285.0,Groceries
+03-05-2026,Local Store 03 May,Local Store,943.0,Shopping
+03-06-2026,Zomato 03 Jun,Zomato,519.0,Food & Dining
+03-06-2026,Local Grocer 03 Jun,Local Grocer,816.0,Groceries
+03-06-2026,Zomato 03 Jun,Zomato,339.0,Food & Dining
+03-06-2026,Myntra 03 Jun,Myntra,2740.0,Shopping
+03-06-2026,Swiggy 03 Jun,Swiggy,161.0,Food & Dining
+03-06-2026,Credit Card Payment 03 Jun,Credit Card Payment,57524.0,Transfers
+03-06-2026,Misc Expense 03 Jun,Misc Expense,864.0,Other
+04-01-2026,Indian Oil 04 Jan,Indian Oil,1530.0,Transport
+04-01-2026,Subway 04 Jan,Subway,564.0,Food & Dining
+04-01-2026,Zomato 04 Jan,Zomato,273.0,Food & Dining
+04-01-2026,Dosa Plaza 04 Jan,Dosa Plaza,410.0,Food & Dining
+04-01-2026,Ajio 04 Jan,Ajio,721.0,Shopping
+04-01-2026,Misc Expense 04 Jan,Misc Expense,619.0,Other
+04-01-2026,Reliance Fresh 04 Jan,Reliance Fresh,407.0,Groceries
+04-01-2026,FD Deposit 04 Jan,FD Deposit,20372.0,Transfers
+04-01-2026,Misc Expense 04 Jan,Misc Expense,696.0,Other
+04-01-2026,DMart 04 Jan,DMart,3490.0,Groceries
+04-01-2026,Broadband Bill 04 Jan,Broadband Bill,1421.0,Bills & Utilities
+04-02-2026,Ola 04 Feb,Ola,295.0,Transport
+04-02-2026,Local Cafe 04 Feb,Local Cafe,149.0,Food & Dining
+04-02-2026,Water Bill 04 Feb,Water Bill,466.0,Bills & Utilities
+04-02-2026,Electricity Board 04 Feb,Electricity Board,943.0,Bills & Utilities
+04-02-2026,Society Maintenance 04 Feb,Society Maintenance,2949.0,Bills & Utilities
+04-02-2026,ATM Fee 04 Feb,ATM Fee,22.0,Other
+04-02-2026,Jio Recharge 04 Feb,Jio Recharge,809.0,Bills & Utilities
+04-03-2026,PlayStation Store 04 Mar,PlayStation Store,3314.0,Entertainment
+04-03-2026,Indian Oil 04 Mar,Indian Oil,1609.0,Transport
+04-03-2026,Local Grocer 04 Mar,Local Grocer,979.0,Groceries
+04-03-2026,Local Grocer 04 Mar,Local Grocer,361.0,Groceries
+04-03-2026,ATM Fee 04 Mar,ATM Fee,23.0,Other
+04-03-2026,Jio Recharge 04 Mar,Jio Recharge,563.0,Bills & Utilities
+04-04-2026,Spotify 04 Apr,Spotify,142.0,Subscriptions
+04-04-2026,Indian Oil 04 Apr,Indian Oil,1838.0,Transport
+04-04-2026,Swiggy 04 Apr,Swiggy,376.0,Food & Dining
+04-04-2026,Big Basket 04 Apr,Big Basket,1321.0,Groceries
+04-04-2026,Local Grocer 04 Apr,Local Grocer,834.0,Groceries
+04-04-2026,Amazon 04 Apr,Amazon,3091.0,Shopping
+04-04-2026,Swiggy 04 Apr,Swiggy,186.0,Food & Dining
+04-05-2026,Pizza Hut 04 May,Pizza Hut,764.0,Food & Dining
+04-05-2026,Pizza Hut 04 May,Pizza Hut,509.0,Food & Dining
+04-05-2026,Misc Expense 04 May,Misc Expense,227.0,Other
+04-06-2026,Uber 04 Jun,Uber,473.0,Transport
+04-06-2026,Google One 04 Jun,Google One,307.0,Subscriptions
+04-06-2026,Dosa Plaza 04 Jun,Dosa Plaza,283.0,Food & Dining
+04-06-2026,Zepto 04 Jun,Zepto,393.0,Groceries
+04-06-2026,Local Store 04 Jun,Local Store,1599.0,Shopping
+04-06-2026,Local Grocer 04 Jun,Local Grocer,594.0,Groceries
+04-06-2026,Water Bill 04 Jun,Water Bill,691.0,Bills & Utilities
+04-06-2026,Big Basket 04 Jun,Big Basket,887.0,Groceries
+04-06-2026,Reliance Fresh 04 Jun,Reliance Fresh,2457.0,Groceries
+05-01-2026,Uber Pool 05 Jan,Uber Pool,121.0,Transport
+05-01-2026,DMart 05 Jan,DMart,1443.0,Groceries
+05-01-2026,Swiggy 05 Jan,Swiggy,253.0,Food & Dining
+05-01-2026,Subway 05 Jan,Subway,258.0,Food & Dining
+05-01-2026,Mutual Fund 05 Jan,Mutual Fund,1044.0,Transfers
+05-01-2026,iCloud 05 Jan,iCloud,299.0,Subscriptions
+05-02-2026,Local Store 05 Feb,Local Store,1265.0,Shopping
+05-02-2026,Pizza Hut 05 Feb,Pizza Hut,626.0,Food & Dining
+05-02-2026,BookMyShow 05 Feb,BookMyShow,587.0,Entertainment
+05-02-2026,Electricity Board 05 Feb,Electricity Board,1624.0,Bills & Utilities
+05-02-2026,Myntra 05 Feb,Myntra,2894.0,Shopping
+05-02-2026,Decathlon 05 Feb,Decathlon,2119.0,Shopping
+05-02-2026,Amazon 05 Feb,Amazon,1464.0,Shopping
+05-02-2026,Indian Oil 05 Feb,Indian Oil,1728.0,Transport
+05-02-2026,Zepto 05 Feb,Zepto,911.0,Groceries
+05-02-2026,Steam 05 Feb,Steam,2952.0,Entertainment
+05-03-2026,Electricity Board 05 Mar,Electricity Board,2883.0,Bills & Utilities
+05-03-2026,Local Cafe 05 Mar,Local Cafe,308.0,Food & Dining
+05-03-2026,PlayStation Store 05 Mar,PlayStation Store,2855.0,Entertainment
+05-03-2026,Credit Card Payment 05 Mar,Credit Card Payment,39612.0,Transfers
+05-04-2026,Mutual Fund 05 Apr,Mutual Fund,1988.0,Transfers
+05-04-2026,Zomato 05 Apr,Zomato,910.0,Food & Dining
+05-04-2026,Rent Transfer 05 Apr,Rent Transfer,18552.0,Transfers
+05-04-2026,Dosa Plaza 05 Apr,Dosa Plaza,261.0,Food & Dining
+05-04-2026,Ola 05 Apr,Ola,388.0,Transport
+05-04-2026,Apollo Pharmacy 05 Apr,Apollo Pharmacy,213.0,Healthcare
+05-04-2026,YouTube Premium 05 Apr,YouTube Premium,140.0,Subscriptions
+05-04-2026,McDonalds 05 Apr,McDonalds,451.0,Food & Dining
+05-04-2026,Society Maintenance 05 Apr,Society Maintenance,2808.0,Bills & Utilities
+05-05-2026,Zepto 05 May,Zepto,1143.0,Groceries
+05-05-2026,Dominos 05 May,Dominos,328.0,Food & Dining
+05-05-2026,Indian Oil 05 May,Indian Oil,1384.0,Transport
+05-05-2026,Big Basket 05 May,Big Basket,683.0,Groceries
+05-05-2026,Airtel Recharge 05 May,Airtel Recharge,472.0,Bills & Utilities
+05-05-2026,Ola 05 May,Ola,292.0,Transport
+05-05-2026,Rent Payment 05 May,Rent Payment,23936.0,Bills & Utilities
+05-05-2026,Local Cafe 05 May,Local Cafe,150.0,Food & Dining
+05-05-2026,Flipkart 05 May,Flipkart,1249.0,Shopping
+05-05-2026,Random 05 May,Random,379.0,Other
+05-06-2026,Uber 05 Jun,Uber,254.0,Transport
+05-06-2026,Steam 05 Jun,Steam,2049.0,Entertainment
+05-06-2026,Zomato 05 Jun,Zomato,383.0,Food & Dining
+05-06-2026,Parking 05 Jun,Parking,47.0,Transport
+06-01-2026,Local Grocer 06 Jan,Local Grocer,243.0,Groceries
+06-01-2026,Reliance Fresh 06 Jan,Reliance Fresh,849.0,Groceries
+06-01-2026,Zomato 06 Jan,Zomato,529.0,Food & Dining
+06-01-2026,Zepto 06 Jan,Zepto,1021.0,Groceries
+06-01-2026,Burger King 06 Jan,Burger King,251.0,Food & Dining
+06-01-2026,McDonalds 06 Jan,McDonalds,462.0,Food & Dining
+06-01-2026,Zomato Dining 06 Jan,Zomato Dining,647.0,Entertainment
+06-01-2026,Zomato 06 Jan,Zomato,663.0,Food & Dining
+06-01-2026,Subway 06 Jan,Subway,312.0,Food & Dining
+06-02-2026,Local Grocer 06 Feb,Local Grocer,759.0,Groceries
+06-02-2026,Flipkart 06 Feb,Flipkart,1514.0,Shopping
+06-02-2026,Society Maintenance 06 Feb,Society Maintenance,1819.0,Bills & Utilities
+06-02-2026,Decathlon 06 Feb,Decathlon,2280.0,Shopping
+06-02-2026,Blinkit 06 Feb,Blinkit,644.0,Groceries
+06-02-2026,Dominos 06 Feb,Dominos,377.0,Food & Dining
+06-02-2026,Zomato 06 Feb,Zomato,479.0,Food & Dining
+06-02-2026,Dominos 06 Feb,Dominos,467.0,Food & Dining
+06-03-2026,Rapido 06 Mar,Rapido,95.0,Transport
+06-03-2026,Rent Transfer 06 Mar,Rent Transfer,9048.0,Transfers
+06-03-2026,Dosa Plaza 06 Mar,Dosa Plaza,150.0,Food & Dining
+06-03-2026,Random 06 Mar,Random,487.0,Other
+06-03-2026,Big Basket 06 Mar,Big Basket,648.0,Groceries
+06-03-2026,DMart 06 Mar,DMart,2094.0,Groceries
+06-03-2026,Dominos 06 Mar,Dominos,658.0,Food & Dining
+06-04-2026,Reliance Fresh 06 Apr,Reliance Fresh,2406.0,Groceries
+06-04-2026,Jio Recharge 06 Apr,Jio Recharge,870.0,Bills & Utilities
+06-04-2026,Reliance Fresh 06 Apr,Reliance Fresh,971.0,Groceries
+06-04-2026,Health Checkup 06 Apr,Health Checkup,3595.0,Healthcare
+06-04-2026,Swiggy 06 Apr,Swiggy,592.0,Food & Dining
+06-05-2026,IKEA 06 May,IKEA,6396.0,Shopping
+06-05-2026,Swiggy 06 May,Swiggy,411.0,Food & Dining
+06-05-2026,Local Cafe 06 May,Local Cafe,246.0,Food & Dining
+06-06-2026,Subway 06 Jun,Subway,418.0,Food & Dining
+06-06-2026,DMart 06 Jun,DMart,2537.0,Groceries
+06-06-2026,Zepto 06 Jun,Zepto,1009.0,Groceries
+06-06-2026,Random 06 Jun,Random,487.0,Other
+06-06-2026,Swiggy 06 Jun,Swiggy,295.0,Food & Dining
+06-06-2026,Google One 06 Jun,Google One,161.0,Subscriptions
+06-06-2026,Local Store 06 Jun,Local Store,1453.0,Shopping
+06-06-2026,Water Bill 06 Jun,Water Bill,940.0,Bills & Utilities
+07-01-2026,Ola 07 Jan,Ola,144.0,Transport
+07-01-2026,YouTube Premium 07 Jan,YouTube Premium,161.0,Subscriptions
+07-01-2026,IKEA 07 Jan,IKEA,2671.0,Shopping
+07-01-2026,Subway 07 Jan,Subway,279.0,Food & Dining
+07-01-2026,Zomato 07 Jan,Zomato,538.0,Food & Dining
+07-01-2026,Rent Transfer 07 Jan,Rent Transfer,21352.0,Transfers
+07-01-2026,Electricity Board 07 Jan,Electricity Board,625.0,Bills & Utilities
+07-01-2026,McDonalds 07 Jan,McDonalds,491.0,Food & Dining
+07-01-2026,Subway 07 Jan,Subway,365.0,Food & Dining
+07-01-2026,McDonalds 07 Jan,McDonalds,374.0,Food & Dining
+07-02-2026,Local Grocer 07 Feb,Local Grocer,390.0,Groceries
+07-02-2026,Pizza Hut 07 Feb,Pizza Hut,622.0,Food & Dining
+07-02-2026,Random 07 Feb,Random,462.0,Other
+07-02-2026,Dominos 07 Feb,Dominos,949.0,Food & Dining
+07-02-2026,Google One 07 Feb,Google One,301.0,Subscriptions
+07-02-2026,Myntra 07 Feb,Myntra,1993.0,Shopping
+07-03-2026,Big Basket 07 Mar,Big Basket,1224.0,Groceries
+07-03-2026,Big Basket 07 Mar,Big Basket,1157.0,Groceries
+07-03-2026,Swiggy 07 Mar,Swiggy,758.0,Food & Dining
+07-03-2026,Reliance Fresh 07 Mar,Reliance Fresh,2047.0,Groceries
+07-03-2026,BookMyShow 07 Mar,BookMyShow,606.0,Entertainment
+07-03-2026,Cash Withdrawal 07 Mar,Cash Withdrawal,2822.0,Other
+07-03-2026,Reliance Fresh 07 Mar,Reliance Fresh,2413.0,Groceries
+07-03-2026,Reliance Fresh 07 Mar,Reliance Fresh,2022.0,Groceries
+07-03-2026,UPI to Friend 07 Mar,UPI to Friend,874.0,Transfers
+07-03-2026,McDonalds 07 Mar,McDonalds,447.0,Food & Dining
+07-03-2026,Blinkit 07 Mar,Blinkit,442.0,Groceries
+07-04-2026,PlayStation Store 07 Apr,PlayStation Store,3543.0,Entertainment
+07-04-2026,Zomato Dining 07 Apr,Zomato Dining,582.0,Entertainment
+07-04-2026,Ola 07 Apr,Ola,263.0,Transport
+07-04-2026,Rent Payment 07 Apr,Rent Payment,17605.0,Bills & Utilities
+07-04-2026,Dosa Plaza 07 Apr,Dosa Plaza,122.0,Food & Dining
+07-04-2026,UPI to Friend 07 Apr,UPI to Friend,2674.0,Transfers
+07-04-2026,Local Grocer 07 Apr,Local Grocer,713.0,Groceries
+07-04-2026,Mutual Fund 07 Apr,Mutual Fund,16440.0,Transfers
+07-04-2026,IKEA 07 Apr,IKEA,5280.0,Shopping
+07-05-2026,Electricity Board 07 May,Electricity Board,2049.0,Bills & Utilities
+07-05-2026,Big Basket 07 May,Big Basket,1664.0,Groceries
+07-05-2026,Dominos 07 May,Dominos,525.0,Food & Dining
+07-05-2026,Local Grocer 07 May,Local Grocer,575.0,Groceries
+07-05-2026,Pizza Hut 07 May,Pizza Hut,495.0,Food & Dining
+07-05-2026,Swiggy 07 May,Swiggy,368.0,Food & Dining
+07-05-2026,Credit Card Payment 07 May,Credit Card Payment,5534.0,Transfers
+07-05-2026,Parking 07 May,Parking,99.0,Transport
+07-05-2026,Dosa Plaza 07 May,Dosa Plaza,288.0,Food & Dining
+07-05-2026,Blinkit 07 May,Blinkit,1112.0,Groceries
+07-06-2026,Flipkart 07 Jun,Flipkart,811.0,Shopping
+07-06-2026,Big Basket 07 Jun,Big Basket,1184.0,Groceries
+07-06-2026,Subway 07 Jun,Subway,265.0,Food & Dining
+07-06-2026,Amazon Prime 07 Jun,Amazon Prime,316.0,Subscriptions
+07-06-2026,Dominos 07 Jun,Dominos,602.0,Food & Dining
+07-06-2026,Burger King 07 Jun,Burger King,359.0,Food & Dining
+07-06-2026,PlayStation Store 07 Jun,PlayStation Store,1681.0,Entertainment
+07-06-2026,Nykaa 07 Jun,Nykaa,1842.0,Shopping
+07-06-2026,Burger King 07 Jun,Burger King,755.0,Food & Dining
+07-06-2026,McDonalds 07 Jun,McDonalds,709.0,Food & Dining
+08-01-2026,Uber 08 Jan,Uber,137.0,Transport
+08-01-2026,Dosa Plaza 08 Jan,Dosa Plaza,279.0,Food & Dining
+08-01-2026,Pizza Hut 08 Jan,Pizza Hut,817.0,Food & Dining
+08-01-2026,Misc Expense 08 Jan,Misc Expense,684.0,Other
+08-01-2026,UPI to Friend 08 Jan,UPI to Friend,1412.0,Transfers
+08-01-2026,Rent Transfer 08 Jan,Rent Transfer,10643.0,Transfers
+08-01-2026,Local Grocer 08 Jan,Local Grocer,707.0,Groceries
+08-02-2026,Swiggy 08 Feb,Swiggy,365.0,Food & Dining
+08-02-2026,Dosa Plaza 08 Feb,Dosa Plaza,427.0,Food & Dining
+08-02-2026,BookMyShow 08 Feb,BookMyShow,768.0,Entertainment
+08-02-2026,Parking 08 Feb,Parking,94.0,Transport
+08-02-2026,PlayStation Store 08 Feb,PlayStation Store,2070.0,Entertainment
+08-02-2026,Jio Recharge 08 Feb,Jio Recharge,614.0,Bills & Utilities
+08-02-2026,Subway 08 Feb,Subway,604.0,Food & Dining
+08-02-2026,Pizza Hut 08 Feb,Pizza Hut,1230.0,Food & Dining
+08-02-2026,Cash Withdrawal 08 Feb,Cash Withdrawal,4106.0,Other
+08-02-2026,Zepto 08 Feb,Zepto,512.0,Groceries
+08-02-2026,Local Cafe 08 Feb,Local Cafe,192.0,Food & Dining
+08-02-2026,Big Basket 08 Feb,Big Basket,858.0,Groceries
+08-02-2026,Pizza Hut 08 Feb,Pizza Hut,967.0,Food & Dining
+08-02-2026,Rent Transfer 08 Feb,Rent Transfer,8486.0,Transfers
+08-03-2026,Reliance Fresh 08 Mar,Reliance Fresh,1633.0,Groceries
+08-03-2026,Zomato 08 Mar,Zomato,691.0,Food & Dining
+08-03-2026,Blinkit 08 Mar,Blinkit,795.0,Groceries
+08-03-2026,Dental Clinic 08 Mar,Dental Clinic,2915.0,Healthcare
+08-03-2026,Zomato Dining 08 Mar,Zomato Dining,759.0,Entertainment
+08-03-2026,Flipkart 08 Mar,Flipkart,2820.0,Shopping
+08-04-2026,Nykaa 08 Apr,Nykaa,1916.0,Shopping
+08-04-2026,McDonalds 08 Apr,McDonalds,453.0,Food & Dining
+08-04-2026,Broadband Bill 08 Apr,Broadband Bill,1026.0,Bills & Utilities
+08-04-2026,Big Basket 08 Apr,Big Basket,1336.0,Groceries
+08-04-2026,Zepto 08 Apr,Zepto,1173.0,Groceries
+08-04-2026,Reliance Fresh 08 Apr,Reliance Fresh,1965.0,Groceries
+08-04-2026,Uber Pool 08 Apr,Uber Pool,95.0,Transport
+08-04-2026,Ola 08 Apr,Ola,371.0,Transport
+08-04-2026,Local Cafe 08 Apr,Local Cafe,323.0,Food & Dining
+08-04-2026,Burger King 08 Apr,Burger King,391.0,Food & Dining
+08-05-2026,Big Basket 08 May,Big Basket,1487.0,Groceries
+08-05-2026,DMart 08 May,DMart,2645.0,Groceries
+08-05-2026,IKEA 08 May,IKEA,3869.0,Shopping
+08-05-2026,Zomato 08 May,Zomato,222.0,Food & Dining
+08-05-2026,Practo 08 May,Practo,375.0,Healthcare
+08-05-2026,Burger King 08 May,Burger King,480.0,Food & Dining
+08-06-2026,DMart 08 Jun,DMart,2170.0,Groceries
+08-06-2026,Ajio 08 Jun,Ajio,980.0,Shopping
+08-06-2026,Rent Payment 08 Jun,Rent Payment,22344.0,Bills & Utilities
+08-06-2026,Steam 08 Jun,Steam,1239.0,Entertainment
+08-06-2026,Zomato 08 Jun,Zomato,693.0,Food & Dining
+08-06-2026,Pizza Hut 08 Jun,Pizza Hut,706.0,Food & Dining
+08-06-2026,Blinkit 08 Jun,Blinkit,994.0,Groceries
+08-06-2026,Dominos 08 Jun,Dominos,620.0,Food & Dining
+08-06-2026,Local Store 08 Jun,Local Store,949.0,Shopping
+08-06-2026,Swiggy 08 Jun,Swiggy,231.0,Food & Dining
+09-01-2026,Broadband Bill 09 Jan,Broadband Bill,1235.0,Bills & Utilities
+09-01-2026,Dominos 09 Jan,Dominos,573.0,Food & Dining
+09-01-2026,Rapido 09 Jan,Rapido,45.0,Transport
+09-01-2026,UPI to Friend 09 Jan,UPI to Friend,1354.0,Transfers
+09-01-2026,Subway 09 Jan,Subway,421.0,Food & Dining
+09-01-2026,Water Bill 09 Jan,Water Bill,892.0,Bills & Utilities
+09-01-2026,Dosa Plaza 09 Jan,Dosa Plaza,259.0,Food & Dining
+09-02-2026,Rapido 09 Feb,Rapido,148.0,Transport
+09-02-2026,Broadband Bill 09 Feb,Broadband Bill,1099.0,Bills & Utilities
+09-02-2026,Misc Expense 09 Feb,Misc Expense,956.0,Other
+09-02-2026,Myntra 09 Feb,Myntra,2161.0,Shopping
+09-02-2026,YouTube Premium 09 Feb,YouTube Premium,159.0,Subscriptions
+09-02-2026,Zomato 09 Feb,Zomato,372.0,Food & Dining
+09-03-2026,Uber 09 Mar,Uber,446.0,Transport
+09-03-2026,Burger King 09 Mar,Burger King,587.0,Food & Dining
+09-03-2026,Local Cafe 09 Mar,Local Cafe,135.0,Food & Dining
+09-03-2026,Subway 09 Mar,Subway,373.0,Food & Dining
+09-03-2026,DMart 09 Mar,DMart,1172.0,Groceries
+09-03-2026,Blinkit 09 Mar,Blinkit,685.0,Groceries
+09-04-2026,Local Grocer 09 Apr,Local Grocer,972.0,Groceries
+09-04-2026,Ola 09 Apr,Ola,135.0,Transport
+09-04-2026,Burger King 09 Apr,Burger King,287.0,Food & Dining
+09-04-2026,Burger King 09 Apr,Burger King,325.0,Food & Dining
+09-04-2026,Myntra 09 Apr,Myntra,2230.0,Shopping
+09-04-2026,Reliance Fresh 09 Apr,Reliance Fresh,498.0,Groceries
+09-04-2026,Mutual Fund 09 Apr,Mutual Fund,13852.0,Transfers
+09-04-2026,Swiggy 09 Apr,Swiggy,399.0,Food & Dining
+09-05-2026,DMart 09 May,DMart,2738.0,Groceries
+09-05-2026,Local Grocer 09 May,Local Grocer,247.0,Groceries
+09-05-2026,Misc Expense 09 May,Misc Expense,146.0,Other
+09-05-2026,Blinkit 09 May,Blinkit,884.0,Groceries
+09-05-2026,Myntra 09 May,Myntra,1896.0,Shopping
+09-05-2026,Society Maintenance 09 May,Society Maintenance,3097.0,Bills & Utilities
+09-05-2026,IKEA 09 May,IKEA,4906.0,Shopping
+09-05-2026,Mutual Fund 09 May,Mutual Fund,4678.0,Transfers
+09-05-2026,Zomato 09 May,Zomato,909.0,Food & Dining
+09-06-2026,Local Cafe 09 Jun,Local Cafe,184.0,Food & Dining
+09-06-2026,Swiggy 09 Jun,Swiggy,566.0,Food & Dining
+09-06-2026,Swiggy 09 Jun,Swiggy,174.0,Food & Dining
+09-06-2026,Airtel Recharge 09 Jun,Airtel Recharge,660.0,Bills & Utilities
+09-06-2026,Pizza Hut 09 Jun,Pizza Hut,696.0,Food & Dining
+10-01-2026,Decathlon 10 Jan,Decathlon,2878.0,Shopping
+10-01-2026,Jio Recharge 10 Jan,Jio Recharge,605.0,Bills & Utilities
+10-01-2026,DMart 10 Jan,DMart,1313.0,Groceries
+10-01-2026,Big Basket 10 Jan,Big Basket,1950.0,Groceries
+10-01-2026,UPI to Friend 10 Jan,UPI to Friend,2643.0,Transfers
+10-01-2026,ATM Fee 10 Jan,ATM Fee,20.0,Other
+10-01-2026,DMart 10 Jan,DMart,3299.0,Groceries
+10-01-2026,Blinkit 10 Jan,Blinkit,490.0,Groceries
+10-01-2026,Health Checkup 10 Jan,Health Checkup,1890.0,Healthcare
+10-01-2026,Ajio 10 Jan,Ajio,960.0,Shopping
+10-01-2026,Dosa Plaza 10 Jan,Dosa Plaza,378.0,Food & Dining
+10-02-2026,Dominos 10 Feb,Dominos,332.0,Food & Dining
+10-02-2026,Swiggy 10 Feb,Swiggy,506.0,Food & Dining
+10-02-2026,Rent Transfer 10 Feb,Rent Transfer,29540.0,Transfers
+10-02-2026,McDonalds 10 Feb,McDonalds,286.0,Food & Dining
+10-02-2026,Local Store 10 Feb,Local Store,424.0,Shopping
+10-02-2026,Mutual Fund 10 Feb,Mutual Fund,9052.0,Transfers
+10-02-2026,Dosa Plaza 10 Feb,Dosa Plaza,218.0,Food & Dining
+10-02-2026,Airtel Recharge 10 Feb,Airtel Recharge,987.0,Bills & Utilities
+10-03-2026,Subway 10 Mar,Subway,406.0,Food & Dining
+10-03-2026,BookMyShow 10 Mar,BookMyShow,656.0,Entertainment
+10-03-2026,Apollo Pharmacy 10 Mar,Apollo Pharmacy,785.0,Healthcare
+10-03-2026,Burger King 10 Mar,Burger King,286.0,Food & Dining
+10-03-2026,PVR 10 Mar,PVR,1292.0,Entertainment
+10-03-2026,PlayStation Store 10 Mar,PlayStation Store,3529.0,Entertainment
+10-03-2026,Reliance Fresh 10 Mar,Reliance Fresh,1273.0,Groceries
+10-03-2026,Swiggy 10 Mar,Swiggy,508.0,Food & Dining
+10-03-2026,McDonalds 10 Mar,McDonalds,361.0,Food & Dining
+10-03-2026,Uber Pool 10 Mar,Uber Pool,173.0,Transport
+10-04-2026,McDonalds 10 Apr,McDonalds,387.0,Food & Dining
+10-04-2026,Zomato Dining 10 Apr,Zomato Dining,1791.0,Entertainment
+10-04-2026,Indian Oil 10 Apr,Indian Oil,1276.0,Transport
+10-04-2026,Cash Withdrawal 10 Apr,Cash Withdrawal,1731.0,Other
+10-04-2026,Dosa Plaza 10 Apr,Dosa Plaza,211.0,Food & Dining
+10-05-2026,Blinkit 10 May,Blinkit,894.0,Groceries
+10-05-2026,Zepto 10 May,Zepto,795.0,Groceries
+10-05-2026,Credit Card Payment 10 May,Credit Card Payment,49624.0,Transfers
+10-05-2026,Zomato Dining 10 May,Zomato Dining,1729.0,Entertainment
+10-05-2026,Amazon 10 May,Amazon,3735.0,Shopping
+10-05-2026,Local Cafe 10 May,Local Cafe,139.0,Food & Dining
+10-05-2026,Local Cafe 10 May,Local Cafe,256.0,Food & Dining
+10-05-2026,Local Grocer 10 May,Local Grocer,544.0,Groceries
+10-05-2026,Subway 10 May,Subway,302.0,Food & Dining
+10-05-2026,Indian Oil 10 May,Indian Oil,1189.0,Transport
+10-05-2026,Jio Recharge 10 May,Jio Recharge,973.0,Bills & Utilities
+10-05-2026,Swiggy 10 May,Swiggy,887.0,Food & Dining
+10-05-2026,Local Cafe 10 May,Local Cafe,103.0,Food & Dining
+10-05-2026,Apollo Pharmacy 10 May,Apollo Pharmacy,1203.0,Healthcare
+10-05-2026,UPI to Friend 10 May,UPI to Friend,2198.0,Transfers
+10-06-2026,Zepto 10 Jun,Zepto,482.0,Groceries
+10-06-2026,Jio Recharge 10 Jun,Jio Recharge,460.0,Bills & Utilities
+10-06-2026,McDonalds 10 Jun,McDonalds,421.0,Food & Dining
+10-06-2026,UPI to Friend 10 Jun,UPI to Friend,1466.0,Transfers
+10-06-2026,Blinkit 10 Jun,Blinkit,1406.0,Groceries
+10-06-2026,Blinkit 10 Jun,Blinkit,795.0,Groceries
+11-01-2026,Zepto 11 Jan,Zepto,799.0,Groceries
+11-01-2026,Local Grocer 11 Jan,Local Grocer,371.0,Groceries
+11-01-2026,Blinkit 11 Jan,Blinkit,392.0,Groceries
+11-01-2026,IKEA 11 Jan,IKEA,1654.0,Shopping
+11-01-2026,Credit Card Payment 11 Jan,Credit Card Payment,21471.0,Transfers
+11-01-2026,Local Grocer 11 Jan,Local Grocer,937.0,Groceries
+11-01-2026,Steam 11 Jan,Steam,1669.0,Entertainment
+11-01-2026,Decathlon 11 Jan,Decathlon,2871.0,Shopping
+11-01-2026,Rapido 11 Jan,Rapido,96.0,Transport
+11-01-2026,Burger King 11 Jan,Burger King,761.0,Food & Dining
+11-02-2026,Pizza Hut 11 Feb,Pizza Hut,874.0,Food & Dining
+11-02-2026,Jio Recharge 11 Feb,Jio Recharge,553.0,Bills & Utilities
+11-02-2026,Gym Membership 11 Feb,Gym Membership,2886.0,Subscriptions
+11-02-2026,PlayStation Store 11 Feb,PlayStation Store,776.0,Entertainment
+11-02-2026,Zomato 11 Feb,Zomato,240.0,Food & Dining
+11-02-2026,Local Grocer 11 Feb,Local Grocer,541.0,Groceries
+11-02-2026,Pizza Hut 11 Feb,Pizza Hut,417.0,Food & Dining
+11-02-2026,iCloud 11 Feb,iCloud,157.0,Subscriptions
+11-02-2026,Local Grocer 11 Feb,Local Grocer,896.0,Groceries
+11-02-2026,ATM Fee 11 Feb,ATM Fee,26.0,Other
+11-03-2026,Dominos 11 Mar,Dominos,692.0,Food & Dining
+11-03-2026,Ola 11 Mar,Ola,165.0,Transport
+11-03-2026,Local Cafe 11 Mar,Local Cafe,317.0,Food & Dining
+11-03-2026,Practo 11 Mar,Practo,402.0,Healthcare
+11-03-2026,Burger King 11 Mar,Burger King,421.0,Food & Dining
+11-03-2026,Reliance Fresh 11 Mar,Reliance Fresh,559.0,Groceries
+11-03-2026,Metro Card 11 Mar,Metro Card,79.0,Transport
+11-03-2026,Dosa Plaza 11 Mar,Dosa Plaza,216.0,Food & Dining
+11-03-2026,Local Grocer 11 Mar,Local Grocer,434.0,Groceries
+11-04-2026,Local Cafe 11 Apr,Local Cafe,394.0,Food & Dining
+11-04-2026,Ajio 11 Apr,Ajio,1959.0,Shopping
+11-04-2026,Reliance Fresh 11 Apr,Reliance Fresh,2409.0,Groceries
+11-04-2026,Dosa Plaza 11 Apr,Dosa Plaza,306.0,Food & Dining
+11-04-2026,Cash Withdrawal 11 Apr,Cash Withdrawal,2768.0,Other
+11-04-2026,Local Cafe 11 Apr,Local Cafe,186.0,Food & Dining
+11-04-2026,Zomato 11 Apr,Zomato,221.0,Food & Dining
+11-04-2026,Hotstar 11 Apr,Hotstar,620.0,Subscriptions
+11-04-2026,Amazon Prime 11 Apr,Amazon Prime,1307.0,Subscriptions
+11-04-2026,Electricity Board 11 Apr,Electricity Board,1397.0,Bills & Utilities
+11-04-2026,Society Maintenance 11 Apr,Society Maintenance,2835.0,Bills & Utilities
+11-05-2026,FD Deposit 11 May,FD Deposit,11959.0,Transfers
+11-05-2026,Airtel Recharge 11 May,Airtel Recharge,337.0,Bills & Utilities
+11-05-2026,Practo 11 May,Practo,823.0,Healthcare
+11-06-2026,Dominos 11 Jun,Dominos,589.0,Food & Dining
+11-06-2026,Zomato 11 Jun,Zomato,626.0,Food & Dining
+11-06-2026,Dosa Plaza 11 Jun,Dosa Plaza,160.0,Food & Dining
+12-01-2026,Zomato Dining 12 Jan,Zomato Dining,1169.0,Entertainment
+12-01-2026,Nykaa 12 Jan,Nykaa,1342.0,Shopping
+12-01-2026,Local Cafe 12 Jan,Local Cafe,159.0,Food & Dining
+12-01-2026,Flipkart 12 Jan,Flipkart,2039.0,Shopping
+12-01-2026,Google One 12 Jan,Google One,278.0,Subscriptions
+12-01-2026,Spotify 12 Jan,Spotify,182.0,Subscriptions
+12-01-2026,Zomato Dining 12 Jan,Zomato Dining,1197.0,Entertainment
+12-01-2026,UPI to Friend 12 Jan,UPI to Friend,1424.0,Transfers
+12-01-2026,Nykaa 12 Jan,Nykaa,1365.0,Shopping
+12-01-2026,Health Checkup 12 Jan,Health Checkup,2037.0,Healthcare
+12-02-2026,Misc Expense 12 Feb,Misc Expense,749.0,Other
+12-02-2026,IKEA 12 Feb,IKEA,3786.0,Shopping
+12-02-2026,DMart 12 Feb,DMart,1571.0,Groceries
+12-02-2026,DMart 12 Feb,DMart,1118.0,Groceries
+12-03-2026,Big Basket 12 Mar,Big Basket,1803.0,Groceries
+12-03-2026,ATM Fee 12 Mar,ATM Fee,29.0,Other
+12-03-2026,Burger King 12 Mar,Burger King,539.0,Food & Dining
+12-03-2026,Zepto 12 Mar,Zepto,604.0,Groceries
+12-03-2026,Rapido 12 Mar,Rapido,54.0,Transport
+12-03-2026,Myntra 12 Mar,Myntra,2686.0,Shopping
+12-03-2026,Local Store 12 Mar,Local Store,348.0,Shopping
+12-03-2026,Zepto 12 Mar,Zepto,953.0,Groceries
+12-03-2026,Pizza Hut 12 Mar,Pizza Hut,408.0,Food & Dining
+12-03-2026,Doctor Visit 12 Mar,Doctor Visit,1841.0,Healthcare
+12-04-2026,Local Store 12 Apr,Local Store,210.0,Shopping
+12-04-2026,IKEA 12 Apr,IKEA,1510.0,Shopping
+12-04-2026,Rent Transfer 12 Apr,Rent Transfer,22333.0,Transfers
+12-04-2026,Dominos 12 Apr,Dominos,769.0,Food & Dining
+12-04-2026,DMart 12 Apr,DMart,1889.0,Groceries
+12-04-2026,UPI to Friend 12 Apr,UPI to Friend,546.0,Transfers
+12-04-2026,Water Bill 12 Apr,Water Bill,435.0,Bills & Utilities
+12-04-2026,Local Cafe 12 Apr,Local Cafe,337.0,Food & Dining
+12-04-2026,Dominos 12 Apr,Dominos,962.0,Food & Dining
+12-04-2026,Broadband Bill 12 Apr,Broadband Bill,1265.0,Bills & Utilities
+12-05-2026,Burger King 12 May,Burger King,590.0,Food & Dining
+12-05-2026,Local Cafe 12 May,Local Cafe,297.0,Food & Dining
+12-05-2026,Indian Oil 12 May,Indian Oil,1654.0,Transport
+12-05-2026,Big Basket 12 May,Big Basket,1098.0,Groceries
+12-05-2026,Amazon Prime 12 May,Amazon Prime,877.0,Subscriptions
+12-05-2026,DMart 12 May,DMart,1329.0,Groceries
+12-05-2026,Local Cafe 12 May,Local Cafe,294.0,Food & Dining
+12-05-2026,Reliance Fresh 12 May,Reliance Fresh,1600.0,Groceries
+12-06-2026,Subway 12 Jun,Subway,322.0,Food & Dining
+12-06-2026,Uber Pool 12 Jun,Uber Pool,127.0,Transport
+12-06-2026,Practo 12 Jun,Practo,529.0,Healthcare
+12-06-2026,Credit Card Payment 12 Jun,Credit Card Payment,13922.0,Transfers
+12-06-2026,Pizza Hut 12 Jun,Pizza Hut,767.0,Food & Dining
+12-06-2026,Reliance Fresh 12 Jun,Reliance Fresh,1406.0,Groceries
+13-01-2026,Blinkit 13 Jan,Blinkit,1283.0,Groceries
+13-01-2026,Rent Payment 13 Jan,Rent Payment,8332.0,Bills & Utilities
+13-01-2026,Burger King 13 Jan,Burger King,393.0,Food & Dining
+13-01-2026,McDonalds 13 Jan,McDonalds,315.0,Food & Dining
+13-02-2026,Zomato 13 Feb,Zomato,426.0,Food & Dining
+13-02-2026,Metro Card 13 Feb,Metro Card,90.0,Transport
+13-02-2026,Blinkit 13 Feb,Blinkit,358.0,Groceries
+13-02-2026,Steam 13 Feb,Steam,2103.0,Entertainment
+13-03-2026,Zomato 13 Mar,Zomato,565.0,Food & Dining
+13-03-2026,Burger King 13 Mar,Burger King,493.0,Food & Dining
+13-03-2026,Nykaa 13 Mar,Nykaa,316.0,Shopping
+13-03-2026,Netflix 13 Mar,Netflix,713.0,Subscriptions
+13-04-2026,IKEA 13 Apr,IKEA,3526.0,Shopping
+13-04-2026,Nykaa 13 Apr,Nykaa,1994.0,Shopping
+13-04-2026,Nykaa 13 Apr,Nykaa,709.0,Shopping
+13-04-2026,Gym Membership 13 Apr,Gym Membership,2072.0,Subscriptions
+13-04-2026,Local Cafe 13 Apr,Local Cafe,106.0,Food & Dining
+13-04-2026,Broadband Bill 13 Apr,Broadband Bill,1323.0,Bills & Utilities
+13-05-2026,Credit Card Payment 13 May,Credit Card Payment,9992.0,Transfers
+13-05-2026,Random 13 May,Random,349.0,Other
+13-05-2026,DMart 13 May,DMart,2570.0,Groceries
+13-05-2026,Burger King 13 May,Burger King,398.0,Food & Dining
+13-06-2026,Cash Withdrawal 13 Jun,Cash Withdrawal,2928.0,Other
+13-06-2026,Gym Membership 13 Jun,Gym Membership,2604.0,Subscriptions
+13-06-2026,Subway 13 Jun,Subway,473.0,Food & Dining
+13-06-2026,FD Deposit 13 Jun,FD Deposit,15618.0,Transfers
+13-06-2026,Uber 13 Jun,Uber,444.0,Transport
+13-06-2026,Amazon 13 Jun,Amazon,4889.0,Shopping
+13-06-2026,Uber 13 Jun,Uber,246.0,Transport
+13-06-2026,Metro Card 13 Jun,Metro Card,41.0,Transport
+13-06-2026,Local Cafe 13 Jun,Local Cafe,202.0,Food & Dining
+13-06-2026,Swiggy 13 Jun,Swiggy,670.0,Food & Dining
+13-06-2026,Ola 13 Jun,Ola,305.0,Transport
+13-06-2026,Burger King 13 Jun,Burger King,370.0,Food & Dining
+13-06-2026,FD Deposit 13 Jun,FD Deposit,11380.0,Transfers
+14-01-2026,FD Deposit 14 Jan,FD Deposit,20070.0,Transfers
+14-01-2026,Society Maintenance 14 Jan,Society Maintenance,3008.0,Bills & Utilities
+14-01-2026,Burger King 14 Jan,Burger King,420.0,Food & Dining
+14-02-2026,Electricity Board 14 Feb,Electricity Board,1402.0,Bills & Utilities
+14-02-2026,Zomato Dining 14 Feb,Zomato Dining,695.0,Entertainment
+14-02-2026,Local Grocer 14 Feb,Local Grocer,775.0,Groceries
+14-02-2026,Nykaa 14 Feb,Nykaa,1092.0,Shopping
+14-02-2026,Dominos 14 Feb,Dominos,574.0,Food & Dining
+14-02-2026,Random 14 Feb,Random,301.0,Other
+14-02-2026,Subway 14 Feb,Subway,504.0,Food & Dining
+14-02-2026,Society Maintenance 14 Feb,Society Maintenance,2937.0,Bills & Utilities
+14-03-2026,Uber 14 Mar,Uber,344.0,Transport
+14-03-2026,BPCL 14 Mar,BPCL,2071.0,Transport
+14-03-2026,Ola 14 Mar,Ola,294.0,Transport
+14-03-2026,Credit Card Payment 14 Mar,Credit Card Payment,29342.0,Transfers
+14-03-2026,UPI to Friend 14 Mar,UPI to Friend,5118.0,Transfers
+14-03-2026,Ajio 14 Mar,Ajio,1562.0,Shopping
+14-03-2026,ATM Fee 14 Mar,ATM Fee,28.0,Other
+14-03-2026,Credit Card Payment 14 Mar,Credit Card Payment,47622.0,Transfers
+14-03-2026,Local Grocer 14 Mar,Local Grocer,554.0,Groceries
+14-03-2026,McDonalds 14 Mar,McDonalds,472.0,Food & Dining
+14-03-2026,Blinkit 14 Mar,Blinkit,1017.0,Groceries
+14-03-2026,Credit Card Payment 14 Mar,Credit Card Payment,7284.0,Transfers
+14-04-2026,McDonalds 14 Apr,McDonalds,296.0,Food & Dining
+14-04-2026,Subway 14 Apr,Subway,333.0,Food & Dining
+14-04-2026,Hotstar 14 Apr,Hotstar,1338.0,Subscriptions
+14-05-2026,Steam 14 May,Steam,337.0,Entertainment
+14-05-2026,Uber 14 May,Uber,233.0,Transport
+14-05-2026,Subway 14 May,Subway,388.0,Food & Dining
+14-05-2026,Swiggy 14 May,Swiggy,259.0,Food & Dining
+14-06-2026,Dominos 14 Jun,Dominos,560.0,Food & Dining
+14-06-2026,Dosa Plaza 14 Jun,Dosa Plaza,234.0,Food & Dining
+14-06-2026,Zepto 14 Jun,Zepto,753.0,Groceries
+14-06-2026,Ola 14 Jun,Ola,275.0,Transport
+14-06-2026,Steam 14 Jun,Steam,1520.0,Entertainment
+14-06-2026,Local Grocer 14 Jun,Local Grocer,633.0,Groceries
+14-06-2026,Dental Clinic 14 Jun,Dental Clinic,2880.0,Healthcare
+14-06-2026,Zomato 14 Jun,Zomato,793.0,Food & Dining
+14-06-2026,Spotify 14 Jun,Spotify,134.0,Subscriptions
+15-01-2026,Zomato Dining 15 Jan,Zomato Dining,729.0,Entertainment
+15-01-2026,Society Maintenance 15 Jan,Society Maintenance,2668.0,Bills & Utilities
+15-01-2026,Rapido 15 Jan,Rapido,101.0,Transport
+15-01-2026,Myntra 15 Jan,Myntra,2667.0,Shopping
+15-01-2026,Dosa Plaza 15 Jan,Dosa Plaza,158.0,Food & Dining
+15-01-2026,Airtel Recharge 15 Jan,Airtel Recharge,494.0,Bills & Utilities
+15-01-2026,PlayStation Store 15 Jan,PlayStation Store,568.0,Entertainment
+15-01-2026,ATM Fee 15 Jan,ATM Fee,22.0,Other
+15-01-2026,Misc Expense 15 Jan,Misc Expense,767.0,Other
+15-02-2026,IKEA 15 Feb,IKEA,6898.0,Shopping
+15-02-2026,Blinkit 15 Feb,Blinkit,606.0,Groceries
+15-02-2026,Rent Transfer 15 Feb,Rent Transfer,11607.0,Transfers
+15-02-2026,Burger King 15 Feb,Burger King,652.0,Food & Dining
+15-02-2026,Rent Transfer 15 Feb,Rent Transfer,12924.0,Transfers
+15-02-2026,PlayStation Store 15 Feb,PlayStation Store,1541.0,Entertainment
+15-02-2026,Pizza Hut 15 Feb,Pizza Hut,795.0,Food & Dining
+15-02-2026,Indian Oil 15 Feb,Indian Oil,2184.0,Transport
+15-02-2026,Local Store 15 Feb,Local Store,425.0,Shopping
+15-02-2026,Apollo Pharmacy 15 Feb,Apollo Pharmacy,259.0,Healthcare
+15-03-2026,Swiggy 15 Mar,Swiggy,842.0,Food & Dining
+15-03-2026,Misc Expense 15 Mar,Misc Expense,66.0,Other
+15-03-2026,Pizza Hut 15 Mar,Pizza Hut,1305.0,Food & Dining
+15-03-2026,Myntra 15 Mar,Myntra,799.0,Shopping
+15-03-2026,Reliance Fresh 15 Mar,Reliance Fresh,1686.0,Groceries
+15-03-2026,Dosa Plaza 15 Mar,Dosa Plaza,249.0,Food & Dining
+15-03-2026,Zomato 15 Mar,Zomato,635.0,Food & Dining
+15-03-2026,Local Grocer 15 Mar,Local Grocer,629.0,Groceries
+15-03-2026,Hotstar 15 Mar,Hotstar,369.0,Subscriptions
+15-03-2026,Subway 15 Mar,Subway,564.0,Food & Dining
+15-04-2026,Swiggy 15 Apr,Swiggy,230.0,Food & Dining
+15-04-2026,McDonalds 15 Apr,McDonalds,473.0,Food & Dining
+15-04-2026,Netflix 15 Apr,Netflix,959.0,Subscriptions
+15-04-2026,Burger King 15 Apr,Burger King,476.0,Food & Dining
+15-05-2026,Netflix 15 May,Netflix,876.0,Subscriptions
+15-05-2026,Swiggy 15 May,Swiggy,278.0,Food & Dining
+15-05-2026,Doctor Visit 15 May,Doctor Visit,1796.0,Healthcare
+15-05-2026,Health Checkup 15 May,Health Checkup,1925.0,Healthcare
+15-05-2026,Uber 15 May,Uber,127.0,Transport
+15-06-2026,DMart 15 Jun,DMart,1726.0,Groceries
+15-06-2026,McDonalds 15 Jun,McDonalds,450.0,Food & Dining
+15-06-2026,Local Grocer 15 Jun,Local Grocer,716.0,Groceries
+15-06-2026,Indian Oil 15 Jun,Indian Oil,2946.0,Transport
+15-06-2026,Reliance Fresh 15 Jun,Reliance Fresh,2408.0,Groceries
+15-06-2026,Zepto 15 Jun,Zepto,993.0,Groceries
+15-06-2026,Nykaa 15 Jun,Nykaa,1079.0,Shopping
+15-06-2026,Water Bill 15 Jun,Water Bill,831.0,Bills & Utilities
+16-01-2026,Steam 16 Jan,Steam,592.0,Entertainment
+16-01-2026,BPCL 16 Jan,BPCL,1591.0,Transport
+16-01-2026,Local Grocer 16 Jan,Local Grocer,926.0,Groceries
+16-01-2026,DMart 16 Jan,DMart,2440.0,Groceries
+16-02-2026,Zomato 16 Feb,Zomato,225.0,Food & Dining
+16-02-2026,McDonalds 16 Feb,McDonalds,340.0,Food & Dining
+16-02-2026,Cash Withdrawal 16 Feb,Cash Withdrawal,3923.0,Other
+16-02-2026,Ajio 16 Feb,Ajio,2422.0,Shopping
+16-02-2026,Amazon 16 Feb,Amazon,538.0,Shopping
+16-02-2026,Burger King 16 Feb,Burger King,427.0,Food & Dining
+16-02-2026,Subway 16 Feb,Subway,317.0,Food & Dining
+16-02-2026,DMart 16 Feb,DMart,2747.0,Groceries
+16-03-2026,Blinkit 16 Mar,Blinkit,433.0,Groceries
+16-03-2026,Dominos 16 Mar,Dominos,484.0,Food & Dining
+16-03-2026,Zomato 16 Mar,Zomato,314.0,Food & Dining
+16-03-2026,Zomato 16 Mar,Zomato,448.0,Food & Dining
+16-03-2026,UPI to Friend 16 Mar,UPI to Friend,1072.0,Transfers
+16-03-2026,Dominos 16 Mar,Dominos,675.0,Food & Dining
+16-03-2026,Swiggy 16 Mar,Swiggy,260.0,Food & Dining
+16-04-2026,UPI to Friend 16 Apr,UPI to Friend,1882.0,Transfers
+16-04-2026,Swiggy 16 Apr,Swiggy,439.0,Food & Dining
+16-04-2026,Decathlon 16 Apr,Decathlon,1607.0,Shopping
+16-04-2026,Electricity Board 16 Apr,Electricity Board,2252.0,Bills & Utilities
+16-04-2026,Pizza Hut 16 Apr,Pizza Hut,591.0,Food & Dining
+16-04-2026,Practo 16 Apr,Practo,386.0,Healthcare
+16-04-2026,Broadband Bill 16 Apr,Broadband Bill,865.0,Bills & Utilities
+16-04-2026,Gym Membership 16 Apr,Gym Membership,2936.0,Subscriptions
+16-04-2026,Flipkart 16 Apr,Flipkart,1497.0,Shopping
+16-04-2026,McDonalds 16 Apr,McDonalds,241.0,Food & Dining
+16-05-2026,Swiggy 16 May,Swiggy,619.0,Food & Dining
+16-05-2026,Gym Membership 16 May,Gym Membership,2438.0,Subscriptions
+16-05-2026,Reliance Fresh 16 May,Reliance Fresh,1963.0,Groceries
+16-05-2026,Misc Expense 16 May,Misc Expense,947.0,Other
+16-05-2026,Uber 16 May,Uber,116.0,Transport
+16-05-2026,Local Grocer 16 May,Local Grocer,690.0,Groceries
+16-05-2026,Ola 16 May,Ola,182.0,Transport
+16-05-2026,Burger King 16 May,Burger King,677.0,Food & Dining
+16-06-2026,ATM Fee 16 Jun,ATM Fee,21.0,Other
+16-06-2026,Zepto 16 Jun,Zepto,433.0,Groceries
+16-06-2026,Blinkit 16 Jun,Blinkit,931.0,Groceries
+16-06-2026,Dosa Plaza 16 Jun,Dosa Plaza,223.0,Food & Dining
+16-06-2026,ATM Fee 16 Jun,ATM Fee,26.0,Other
+16-06-2026,Credit Card Payment 16 Jun,Credit Card Payment,28695.0,Transfers
+17-01-2026,Ajio 17 Jan,Ajio,614.0,Shopping
+17-01-2026,Metro Card 17 Jan,Metro Card,73.0,Transport
+17-01-2026,Spotify 17 Jan,Spotify,183.0,Subscriptions
+17-01-2026,Parking 17 Jan,Parking,26.0,Transport
+17-01-2026,PlayStation Store 17 Jan,PlayStation Store,869.0,Entertainment
+17-01-2026,Mutual Fund 17 Jan,Mutual Fund,7366.0,Transfers
+17-01-2026,Rapido 17 Jan,Rapido,129.0,Transport
+17-01-2026,Apollo Pharmacy 17 Jan,Apollo Pharmacy,563.0,Healthcare
+17-02-2026,FD Deposit 17 Feb,FD Deposit,20277.0,Transfers
+17-02-2026,Subway 17 Feb,Subway,249.0,Food & Dining
+17-02-2026,Uber Pool 17 Feb,Uber Pool,105.0,Transport
+17-02-2026,Swiggy 17 Feb,Swiggy,212.0,Food & Dining
+17-02-2026,Credit Card Payment 17 Feb,Credit Card Payment,19952.0,Transfers
+17-02-2026,Random 17 Feb,Random,249.0,Other
+17-02-2026,Zomato Dining 17 Feb,Zomato Dining,1521.0,Entertainment
+17-02-2026,Subway 17 Feb,Subway,313.0,Food & Dining
+17-02-2026,DMart 17 Feb,DMart,1660.0,Groceries
+17-02-2026,Swiggy 17 Feb,Swiggy,531.0,Food & Dining
+17-03-2026,Metro Card 17 Mar,Metro Card,82.0,Transport
+17-03-2026,Uber 17 Mar,Uber,480.0,Transport
+17-03-2026,Credit Card Payment 17 Mar,Credit Card Payment,8764.0,Transfers
+17-03-2026,Reliance Fresh 17 Mar,Reliance Fresh,2495.0,Groceries
+17-03-2026,Zomato Dining 17 Mar,Zomato Dining,1059.0,Entertainment
+17-03-2026,Pizza Hut 17 Mar,Pizza Hut,833.0,Food & Dining
+17-03-2026,Credit Card Payment 17 Mar,Credit Card Payment,21160.0,Transfers
+17-03-2026,McDonalds 17 Mar,McDonalds,325.0,Food & Dining
+17-03-2026,Pizza Hut 17 Mar,Pizza Hut,404.0,Food & Dining
+17-04-2026,Rent Transfer 17 Apr,Rent Transfer,5211.0,Transfers
+17-04-2026,Blinkit 17 Apr,Blinkit,1126.0,Groceries
+17-04-2026,Parking 17 Apr,Parking,97.0,Transport
+17-04-2026,Metro Card 17 Apr,Metro Card,79.0,Transport
+17-04-2026,Zomato 17 Apr,Zomato,650.0,Food & Dining
+17-04-2026,IKEA 17 Apr,IKEA,3500.0,Shopping
+17-04-2026,Zomato 17 Apr,Zomato,325.0,Food & Dining
+17-04-2026,Broadband Bill 17 Apr,Broadband Bill,1015.0,Bills & Utilities
+17-04-2026,PVR 17 Apr,PVR,526.0,Entertainment
+17-05-2026,Dominos 17 May,Dominos,891.0,Food & Dining
+17-05-2026,ATM Fee 17 May,ATM Fee,26.0,Other
+17-05-2026,Electricity Board 17 May,Electricity Board,829.0,Bills & Utilities
+17-05-2026,Random 17 May,Random,221.0,Other
+17-05-2026,Blinkit 17 May,Blinkit,1145.0,Groceries
+17-05-2026,Subway 17 May,Subway,651.0,Food & Dining
+17-05-2026,PVR 17 May,PVR,740.0,Entertainment
+17-05-2026,Zepto 17 May,Zepto,1119.0,Groceries
+17-05-2026,BPCL 17 May,BPCL,1909.0,Transport
+17-06-2026,Google One 17 Jun,Google One,463.0,Subscriptions
+17-06-2026,Metro Card 17 Jun,Metro Card,32.0,Transport
+17-06-2026,Zepto 17 Jun,Zepto,350.0,Groceries
+17-06-2026,Metro Card 17 Jun,Metro Card,44.0,Transport
+17-06-2026,BookMyShow 17 Jun,BookMyShow,786.0,Entertainment
+17-06-2026,Uber 17 Jun,Uber,463.0,Transport
+17-06-2026,Cash Withdrawal 17 Jun,Cash Withdrawal,4098.0,Other
+18-01-2026,Pizza Hut 18 Jan,Pizza Hut,663.0,Food & Dining
+18-01-2026,Reliance Fresh 18 Jan,Reliance Fresh,2187.0,Groceries
+18-01-2026,Local Cafe 18 Jan,Local Cafe,245.0,Food & Dining
+18-01-2026,Pizza Hut 18 Jan,Pizza Hut,818.0,Food & Dining
+18-01-2026,Health Checkup 18 Jan,Health Checkup,1410.0,Healthcare
+18-01-2026,Swiggy 18 Jan,Swiggy,565.0,Food & Dining
+18-01-2026,Zepto 18 Jan,Zepto,313.0,Groceries
+18-01-2026,Zomato 18 Jan,Zomato,908.0,Food & Dining
+18-01-2026,Zomato 18 Jan,Zomato,831.0,Food & Dining
+18-01-2026,Metro Card 18 Jan,Metro Card,48.0,Transport
+18-01-2026,Local Grocer 18 Jan,Local Grocer,640.0,Groceries
+18-01-2026,Dosa Plaza 18 Jan,Dosa Plaza,276.0,Food & Dining
+18-01-2026,Electricity Board 18 Jan,Electricity Board,1236.0,Bills & Utilities
+18-01-2026,McDonalds 18 Jan,McDonalds,247.0,Food & Dining
+18-01-2026,BPCL 18 Jan,BPCL,1974.0,Transport
+18-02-2026,Nykaa 18 Feb,Nykaa,1505.0,Shopping
+18-02-2026,Steam 18 Feb,Steam,1194.0,Entertainment
+18-02-2026,Amazon 18 Feb,Amazon,3105.0,Shopping
+18-02-2026,Society Maintenance 18 Feb,Society Maintenance,2946.0,Bills & Utilities
+18-02-2026,Pizza Hut 18 Feb,Pizza Hut,485.0,Food & Dining
+18-02-2026,PVR 18 Feb,PVR,435.0,Entertainment
+18-02-2026,Dosa Plaza 18 Feb,Dosa Plaza,195.0,Food & Dining
+18-03-2026,Swiggy 18 Mar,Swiggy,565.0,Food & Dining
+18-03-2026,Gym Membership 18 Mar,Gym Membership,2188.0,Subscriptions
+18-03-2026,McDonalds 18 Mar,McDonalds,241.0,Food & Dining
+18-03-2026,Steam 18 Mar,Steam,1159.0,Entertainment
+18-03-2026,Dominos 18 Mar,Dominos,619.0,Food & Dining
+18-03-2026,Amazon 18 Mar,Amazon,2344.0,Shopping
+18-03-2026,Steam 18 Mar,Steam,581.0,Entertainment
+18-03-2026,Dosa Plaza 18 Mar,Dosa Plaza,287.0,Food & Dining
+18-03-2026,Big Basket 18 Mar,Big Basket,1959.0,Groceries
+18-04-2026,Decathlon 18 Apr,Decathlon,3192.0,Shopping
+18-04-2026,Rent Payment 18 Apr,Rent Payment,22572.0,Bills & Utilities
+18-04-2026,Swiggy 18 Apr,Swiggy,787.0,Food & Dining
+18-04-2026,Metro Card 18 Apr,Metro Card,81.0,Transport
+18-04-2026,Flipkart 18 Apr,Flipkart,3430.0,Shopping
+18-04-2026,Zepto 18 Apr,Zepto,738.0,Groceries
+18-04-2026,Gym Membership 18 Apr,Gym Membership,2817.0,Subscriptions
+18-04-2026,Myntra 18 Apr,Myntra,1415.0,Shopping
+18-04-2026,Local Cafe 18 Apr,Local Cafe,331.0,Food & Dining
+18-04-2026,Myntra 18 Apr,Myntra,2393.0,Shopping
+18-04-2026,Ola 18 Apr,Ola,251.0,Transport
+18-05-2026,Burger King 18 May,Burger King,328.0,Food & Dining
+18-05-2026,Swiggy 18 May,Swiggy,312.0,Food & Dining
+18-05-2026,Uber Pool 18 May,Uber Pool,201.0,Transport
+18-05-2026,Health Checkup 18 May,Health Checkup,2895.0,Healthcare
+18-05-2026,Dominos 18 May,Dominos,764.0,Food & Dining
+18-05-2026,Burger King 18 May,Burger King,518.0,Food & Dining
+18-06-2026,iCloud 18 Jun,iCloud,158.0,Subscriptions
+18-06-2026,Dosa Plaza 18 Jun,Dosa Plaza,175.0,Food & Dining
+18-06-2026,BPCL 18 Jun,BPCL,2037.0,Transport
+18-06-2026,Random 18 Jun,Random,215.0,Other
+18-06-2026,Credit Card Payment 18 Jun,Credit Card Payment,51776.0,Transfers
+19-01-2026,Mutual Fund 19 Jan,Mutual Fund,1014.0,Transfers
+19-01-2026,Ajio 19 Jan,Ajio,2029.0,Shopping
+19-01-2026,Misc Expense 19 Jan,Misc Expense,580.0,Other
+19-01-2026,FD Deposit 19 Jan,FD Deposit,22203.0,Transfers
+19-01-2026,Flipkart 19 Jan,Flipkart,3811.0,Shopping
+19-01-2026,Swiggy 19 Jan,Swiggy,218.0,Food & Dining
+19-01-2026,Zomato 19 Jan,Zomato,279.0,Food & Dining
+19-02-2026,McDonalds 19 Feb,McDonalds,368.0,Food & Dining
+19-02-2026,McDonalds 19 Feb,McDonalds,407.0,Food & Dining
+19-02-2026,Metro Card 19 Feb,Metro Card,73.0,Transport
+19-02-2026,Blinkit 19 Feb,Blinkit,798.0,Groceries
+19-02-2026,DMart 19 Feb,DMart,3285.0,Groceries
+19-02-2026,Local Cafe 19 Feb,Local Cafe,156.0,Food & Dining
+19-03-2026,Apollo Pharmacy 19 Mar,Apollo Pharmacy,405.0,Healthcare
+19-03-2026,Pizza Hut 19 Mar,Pizza Hut,557.0,Food & Dining
+19-03-2026,Blinkit 19 Mar,Blinkit,787.0,Groceries
+19-03-2026,Netflix 19 Mar,Netflix,714.0,Subscriptions
+19-04-2026,Indian Oil 19 Apr,Indian Oil,2472.0,Transport
+19-04-2026,Pizza Hut 19 Apr,Pizza Hut,620.0,Food & Dining
+19-04-2026,McDonalds 19 Apr,McDonalds,485.0,Food & Dining
+19-04-2026,Uber Pool 19 Apr,Uber Pool,230.0,Transport
+19-04-2026,Local Grocer 19 Apr,Local Grocer,975.0,Groceries
+19-04-2026,Broadband Bill 19 Apr,Broadband Bill,1090.0,Bills & Utilities
+19-04-2026,IKEA 19 Apr,IKEA,5114.0,Shopping
+19-04-2026,McDonalds 19 Apr,McDonalds,484.0,Food & Dining
+19-05-2026,DMart 19 May,DMart,3336.0,Groceries
+19-05-2026,Amazon 19 May,Amazon,2747.0,Shopping
+19-05-2026,BookMyShow 19 May,BookMyShow,727.0,Entertainment
+19-05-2026,Uber 19 May,Uber,323.0,Transport
+19-05-2026,Rent Transfer 19 May,Rent Transfer,23362.0,Transfers
+19-05-2026,FD Deposit 19 May,FD Deposit,14227.0,Transfers
+19-05-2026,Electricity Board 19 May,Electricity Board,949.0,Bills & Utilities
+19-05-2026,Broadband Bill 19 May,Broadband Bill,1262.0,Bills & Utilities
+19-05-2026,Amazon 19 May,Amazon,1192.0,Shopping
+19-05-2026,Google One 19 May,Google One,458.0,Subscriptions
+19-06-2026,Mutual Fund 19 Jun,Mutual Fund,2574.0,Transfers
+19-06-2026,Burger King 19 Jun,Burger King,351.0,Food & Dining
+19-06-2026,Uber Pool 19 Jun,Uber Pool,118.0,Transport
+19-06-2026,Steam 19 Jun,Steam,2553.0,Entertainment
+19-06-2026,Random 19 Jun,Random,135.0,Other
+19-06-2026,DMart 19 Jun,DMart,3464.0,Groceries
+20-01-2026,McDonalds 20 Jan,McDonalds,394.0,Food & Dining
+20-01-2026,Burger King 20 Jan,Burger King,408.0,Food & Dining
+20-01-2026,Local Cafe 20 Jan,Local Cafe,277.0,Food & Dining
+20-01-2026,YouTube Premium 20 Jan,YouTube Premium,185.0,Subscriptions
+20-02-2026,Blinkit 20 Feb,Blinkit,578.0,Groceries
+20-02-2026,Pizza Hut 20 Feb,Pizza Hut,728.0,Food & Dining
+20-02-2026,Subway 20 Feb,Subway,268.0,Food & Dining
+20-02-2026,Zomato 20 Feb,Zomato,508.0,Food & Dining
+20-02-2026,Dosa Plaza 20 Feb,Dosa Plaza,249.0,Food & Dining
+20-02-2026,Subway 20 Feb,Subway,256.0,Food & Dining
+20-02-2026,Electricity Board 20 Feb,Electricity Board,2911.0,Bills & Utilities
+20-02-2026,Nykaa 20 Feb,Nykaa,1112.0,Shopping
+20-02-2026,Local Grocer 20 Feb,Local Grocer,419.0,Groceries
+20-02-2026,iCloud 20 Feb,iCloud,277.0,Subscriptions
+20-03-2026,Gym Membership 20 Mar,Gym Membership,2094.0,Subscriptions
+20-03-2026,Electricity Board 20 Mar,Electricity Board,530.0,Bills & Utilities
+20-03-2026,BPCL 20 Mar,BPCL,961.0,Transport
+20-03-2026,Dominos 20 Mar,Dominos,316.0,Food & Dining
+20-04-2026,Uber Pool 20 Apr,Uber Pool,231.0,Transport
+20-04-2026,Dominos 20 Apr,Dominos,624.0,Food & Dining
+20-04-2026,Big Basket 20 Apr,Big Basket,1222.0,Groceries
+20-04-2026,Amazon 20 Apr,Amazon,4487.0,Shopping
+20-04-2026,Mutual Fund 20 Apr,Mutual Fund,1245.0,Transfers
+20-04-2026,Dominos 20 Apr,Dominos,393.0,Food & Dining
+20-04-2026,Spotify 20 Apr,Spotify,173.0,Subscriptions
+20-04-2026,Dominos 20 Apr,Dominos,587.0,Food & Dining
+20-05-2026,Flipkart 20 May,Flipkart,3635.0,Shopping
+20-05-2026,Local Grocer 20 May,Local Grocer,815.0,Groceries
+20-05-2026,Practo 20 May,Practo,838.0,Healthcare
+20-05-2026,Jio Recharge 20 May,Jio Recharge,695.0,Bills & Utilities
+20-05-2026,Amazon Prime 20 May,Amazon Prime,754.0,Subscriptions
+20-05-2026,Pizza Hut 20 May,Pizza Hut,717.0,Food & Dining
+20-05-2026,Amazon Prime 20 May,Amazon Prime,1162.0,Subscriptions
+20-05-2026,Credit Card Payment 20 May,Credit Card Payment,13532.0,Transfers
+20-05-2026,Reliance Fresh 20 May,Reliance Fresh,452.0,Groceries
+20-06-2026,Misc Expense 20 Jun,Misc Expense,619.0,Other
+20-06-2026,Rapido 20 Jun,Rapido,134.0,Transport
+20-06-2026,Random 20 Jun,Random,150.0,Other
+20-06-2026,Swiggy 20 Jun,Swiggy,260.0,Food & Dining
+20-06-2026,Gym Membership 20 Jun,Gym Membership,1745.0,Subscriptions
+20-06-2026,Zepto 20 Jun,Zepto,344.0,Groceries
+20-06-2026,Flipkart 20 Jun,Flipkart,2250.0,Shopping
+20-06-2026,Dominos 20 Jun,Dominos,789.0,Food & Dining
+20-06-2026,Steam 20 Jun,Steam,1033.0,Entertainment
+20-06-2026,McDonalds 20 Jun,McDonalds,216.0,Food & Dining
+20-06-2026,Steam 20 Jun,Steam,1684.0,Entertainment
+21-01-2026,Swiggy 21 Jan,Swiggy,600.0,Food & Dining
+21-01-2026,Dominos 21 Jan,Dominos,696.0,Food & Dining
+21-01-2026,Local Cafe 21 Jan,Local Cafe,275.0,Food & Dining
+21-01-2026,Uber Pool 21 Jan,Uber Pool,94.0,Transport
+21-01-2026,Zepto 21 Jan,Zepto,843.0,Groceries
+21-02-2026,Pizza Hut 21 Feb,Pizza Hut,1016.0,Food & Dining
+21-02-2026,Zomato 21 Feb,Zomato,357.0,Food & Dining
+21-02-2026,Decathlon 21 Feb,Decathlon,3394.0,Shopping
+21-02-2026,Society Maintenance 21 Feb,Society Maintenance,2238.0,Bills & Utilities
+21-02-2026,Metro Card 21 Feb,Metro Card,43.0,Transport
+21-02-2026,Uber Pool 21 Feb,Uber Pool,231.0,Transport
+21-02-2026,Ola 21 Feb,Ola,426.0,Transport
+21-02-2026,Metro Card 21 Feb,Metro Card,91.0,Transport
+21-02-2026,Credit Card Payment 21 Feb,Credit Card Payment,14174.0,Transfers
+21-02-2026,Amazon 21 Feb,Amazon,4592.0,Shopping
+21-02-2026,Swiggy 21 Feb,Swiggy,831.0,Food & Dining
+21-03-2026,Blinkit 21 Mar,Blinkit,557.0,Groceries
+21-03-2026,Airtel Recharge 21 Mar,Airtel Recharge,320.0,Bills & Utilities
+21-03-2026,Pizza Hut 21 Mar,Pizza Hut,448.0,Food & Dining
+21-03-2026,Mutual Fund 21 Mar,Mutual Fund,4142.0,Transfers
+21-03-2026,Uber Pool 21 Mar,Uber Pool,138.0,Transport
+21-03-2026,Local Grocer 21 Mar,Local Grocer,950.0,Groceries
+21-03-2026,Local Grocer 21 Mar,Local Grocer,908.0,Groceries
+21-03-2026,Amazon 21 Mar,Amazon,4950.0,Shopping
+21-03-2026,McDonalds 21 Mar,McDonalds,556.0,Food & Dining
+21-03-2026,Flipkart 21 Mar,Flipkart,478.0,Shopping
+21-03-2026,Mutual Fund 21 Mar,Mutual Fund,1549.0,Transfers
+21-04-2026,Dominos 21 Apr,Dominos,558.0,Food & Dining
+21-04-2026,Pizza Hut 21 Apr,Pizza Hut,834.0,Food & Dining
+21-04-2026,Zomato Dining 21 Apr,Zomato Dining,714.0,Entertainment
+21-04-2026,Local Store 21 Apr,Local Store,502.0,Shopping
+21-04-2026,Misc Expense 21 Apr,Misc Expense,885.0,Other
+21-05-2026,Pizza Hut 21 May,Pizza Hut,828.0,Food & Dining
+21-05-2026,Pizza Hut 21 May,Pizza Hut,519.0,Food & Dining
+21-05-2026,Big Basket 21 May,Big Basket,1402.0,Groceries
+21-05-2026,Swiggy 21 May,Swiggy,444.0,Food & Dining
+21-05-2026,Dental Clinic 21 May,Dental Clinic,2595.0,Healthcare
+21-05-2026,UPI to Friend 21 May,UPI to Friend,208.0,Transfers
+21-05-2026,FD Deposit 21 May,FD Deposit,34790.0,Transfers
+21-06-2026,PVR 21 Jun,PVR,542.0,Entertainment
+21-06-2026,Cash Withdrawal 21 Jun,Cash Withdrawal,3695.0,Other
+21-06-2026,Subway 21 Jun,Subway,334.0,Food & Dining
+21-06-2026,Blinkit 21 Jun,Blinkit,333.0,Groceries
+21-06-2026,McDonalds 21 Jun,McDonalds,637.0,Food & Dining
+21-06-2026,Spotify 21 Jun,Spotify,153.0,Subscriptions
+21-06-2026,BookMyShow 21 Jun,BookMyShow,488.0,Entertainment
+21-06-2026,Reliance Fresh 21 Jun,Reliance Fresh,2268.0,Groceries
+21-06-2026,Blinkit 21 Jun,Blinkit,340.0,Groceries
+21-06-2026,Spotify 21 Jun,Spotify,125.0,Subscriptions
+21-06-2026,Dominos 21 Jun,Dominos,489.0,Food & Dining
+22-01-2026,Water Bill 22 Jan,Water Bill,576.0,Bills & Utilities
+22-01-2026,Burger King 22 Jan,Burger King,472.0,Food & Dining
+22-01-2026,Rapido 22 Jan,Rapido,70.0,Transport
+22-02-2026,Burger King 22 Feb,Burger King,403.0,Food & Dining
+22-02-2026,Local Grocer 22 Feb,Local Grocer,658.0,Groceries
+22-02-2026,Blinkit 22 Feb,Blinkit,281.0,Groceries
+22-02-2026,McDonalds 22 Feb,McDonalds,594.0,Food & Dining
+22-02-2026,Local Cafe 22 Feb,Local Cafe,256.0,Food & Dining
+22-02-2026,Random 22 Feb,Random,161.0,Other
+22-02-2026,Reliance Fresh 22 Feb,Reliance Fresh,1841.0,Groceries
+22-02-2026,DMart 22 Feb,DMart,1103.0,Groceries
+22-02-2026,Indian Oil 22 Feb,Indian Oil,1329.0,Transport
+22-02-2026,Google One 22 Feb,Google One,410.0,Subscriptions
+22-02-2026,Zomato 22 Feb,Zomato,647.0,Food & Dining
+22-03-2026,Cash Withdrawal 22 Mar,Cash Withdrawal,3091.0,Other
+22-03-2026,McDonalds 22 Mar,McDonalds,347.0,Food & Dining
+22-03-2026,DMart 22 Mar,DMart,3499.0,Groceries
+22-03-2026,Steam 22 Mar,Steam,458.0,Entertainment
+22-03-2026,Dosa Plaza 22 Mar,Dosa Plaza,317.0,Food & Dining
+22-03-2026,Credit Card Payment 22 Mar,Credit Card Payment,18806.0,Transfers
+22-03-2026,Jio Recharge 22 Mar,Jio Recharge,940.0,Bills & Utilities
+22-03-2026,Amazon Prime 22 Mar,Amazon Prime,975.0,Subscriptions
+22-03-2026,Random 22 Mar,Random,317.0,Other
+22-03-2026,Swiggy 22 Mar,Swiggy,324.0,Food & Dining
+22-03-2026,Uber 22 Mar,Uber,233.0,Transport
+22-03-2026,Dominos 22 Mar,Dominos,1127.0,Food & Dining
+22-03-2026,Dominos 22 Mar,Dominos,997.0,Food & Dining
+22-04-2026,Flipkart 22 Apr,Flipkart,1227.0,Shopping
+22-04-2026,McDonalds 22 Apr,McDonalds,357.0,Food & Dining
+22-04-2026,Decathlon 22 Apr,Decathlon,1402.0,Shopping
+22-04-2026,Pizza Hut 22 Apr,Pizza Hut,783.0,Food & Dining
+22-04-2026,Jio Recharge 22 Apr,Jio Recharge,712.0,Bills & Utilities
+22-04-2026,Subway 22 Apr,Subway,307.0,Food & Dining
+22-04-2026,Burger King 22 Apr,Burger King,433.0,Food & Dining
+22-04-2026,Pizza Hut 22 Apr,Pizza Hut,730.0,Food & Dining
+22-04-2026,Blinkit 22 Apr,Blinkit,987.0,Groceries
+22-04-2026,Rent Transfer 22 Apr,Rent Transfer,17328.0,Transfers
+22-05-2026,Local Cafe 22 May,Local Cafe,181.0,Food & Dining
+22-05-2026,Burger King 22 May,Burger King,545.0,Food & Dining
+22-05-2026,Ola 22 May,Ola,349.0,Transport
+22-05-2026,BPCL 22 May,BPCL,1983.0,Transport
+22-05-2026,Flipkart 22 May,Flipkart,2141.0,Shopping
+22-05-2026,IKEA 22 May,IKEA,2818.0,Shopping
+22-05-2026,Myntra 22 May,Myntra,2916.0,Shopping
+22-06-2026,Metro Card 22 Jun,Metro Card,33.0,Transport
+22-06-2026,Credit Card Payment 22 Jun,Credit Card Payment,10882.0,Transfers
+22-06-2026,Zomato 22 Jun,Zomato,591.0,Food & Dining
+23-01-2026,Reliance Fresh 23 Jan,Reliance Fresh,2216.0,Groceries
+23-01-2026,Health Checkup 23 Jan,Health Checkup,2653.0,Healthcare
+23-01-2026,Reliance Fresh 23 Jan,Reliance Fresh,1713.0,Groceries
+23-01-2026,Local Grocer 23 Jan,Local Grocer,596.0,Groceries
+23-01-2026,Electricity Board 23 Jan,Electricity Board,1637.0,Bills & Utilities
+23-02-2026,PlayStation Store 23 Feb,PlayStation Store,962.0,Entertainment
+23-02-2026,Uber Pool 23 Feb,Uber Pool,194.0,Transport
+23-02-2026,Burger King 23 Feb,Burger King,371.0,Food & Dining
+23-02-2026,Misc Expense 23 Feb,Misc Expense,987.0,Other
+23-02-2026,Dominos 23 Feb,Dominos,684.0,Food & Dining
+23-02-2026,Random 23 Feb,Random,279.0,Other
+23-02-2026,Subway 23 Feb,Subway,233.0,Food & Dining
+23-02-2026,Subway 23 Feb,Subway,298.0,Food & Dining
+23-02-2026,Misc Expense 23 Feb,Misc Expense,768.0,Other
+23-02-2026,Local Cafe 23 Feb,Local Cafe,304.0,Food & Dining
+23-03-2026,Parking 23 Mar,Parking,80.0,Transport
+23-03-2026,Rent Transfer 23 Mar,Rent Transfer,10690.0,Transfers
+23-03-2026,Local Grocer 23 Mar,Local Grocer,436.0,Groceries
+23-03-2026,Burger King 23 Mar,Burger King,548.0,Food & Dining
+23-03-2026,Ajio 23 Mar,Ajio,1743.0,Shopping
+23-03-2026,ATM Fee 23 Mar,ATM Fee,27.0,Other
+23-03-2026,Mutual Fund 23 Mar,Mutual Fund,3422.0,Transfers
+23-03-2026,Local Cafe 23 Mar,Local Cafe,181.0,Food & Dining
+23-04-2026,Flipkart 23 Apr,Flipkart,2271.0,Shopping
+23-04-2026,Dosa Plaza 23 Apr,Dosa Plaza,194.0,Food & Dining
+23-04-2026,DMart 23 Apr,DMart,1485.0,Groceries
+23-05-2026,DMart 23 May,DMart,2463.0,Groceries
+23-05-2026,Dosa Plaza 23 May,Dosa Plaza,395.0,Food & Dining
+23-05-2026,Big Basket 23 May,Big Basket,671.0,Groceries
+23-05-2026,Zomato 23 May,Zomato,462.0,Food & Dining
+23-05-2026,BPCL 23 May,BPCL,819.0,Transport
+23-05-2026,Decathlon 23 May,Decathlon,1949.0,Shopping
+23-05-2026,Zomato 23 May,Zomato,827.0,Food & Dining
+23-05-2026,Uber 23 May,Uber,358.0,Transport
+23-05-2026,Local Store 23 May,Local Store,1963.0,Shopping
+23-05-2026,Uber Pool 23 May,Uber Pool,164.0,Transport
+23-06-2026,PlayStation Store 23 Jun,PlayStation Store,1984.0,Entertainment
+23-06-2026,Electricity Board 23 Jun,Electricity Board,2934.0,Bills & Utilities
+23-06-2026,McDonalds 23 Jun,McDonalds,489.0,Food & Dining
+23-06-2026,Amazon Prime 23 Jun,Amazon Prime,827.0,Subscriptions
+23-06-2026,Subway 23 Jun,Subway,413.0,Food & Dining
+23-06-2026,FD Deposit 23 Jun,FD Deposit,24088.0,Transfers
+23-06-2026,Flipkart 23 Jun,Flipkart,3351.0,Shopping
+24-01-2026,Cash Withdrawal 24 Jan,Cash Withdrawal,3694.0,Other
+24-01-2026,Burger King 24 Jan,Burger King,311.0,Food & Dining
+24-01-2026,Pizza Hut 24 Jan,Pizza Hut,1222.0,Food & Dining
+24-01-2026,Rent Transfer 24 Jan,Rent Transfer,6271.0,Transfers
+24-01-2026,Apollo Pharmacy 24 Jan,Apollo Pharmacy,559.0,Healthcare
+24-01-2026,Indian Oil 24 Jan,Indian Oil,1767.0,Transport
+24-01-2026,Mutual Fund 24 Jan,Mutual Fund,8928.0,Transfers
+24-01-2026,Credit Card Payment 24 Jan,Credit Card Payment,34918.0,Transfers
+24-01-2026,Parking 24 Jan,Parking,64.0,Transport
+24-01-2026,iCloud 24 Jan,iCloud,263.0,Subscriptions
+24-02-2026,BPCL 24 Feb,BPCL,1221.0,Transport
+24-02-2026,Zepto 24 Feb,Zepto,355.0,Groceries
+24-02-2026,Electricity Board 24 Feb,Electricity Board,1102.0,Bills & Utilities
+24-02-2026,Blinkit 24 Feb,Blinkit,1481.0,Groceries
+24-02-2026,Dosa Plaza 24 Feb,Dosa Plaza,224.0,Food & Dining
+24-02-2026,Society Maintenance 24 Feb,Society Maintenance,1641.0,Bills & Utilities
+24-02-2026,Airtel Recharge 24 Feb,Airtel Recharge,607.0,Bills & Utilities
+24-02-2026,Nykaa 24 Feb,Nykaa,1316.0,Shopping
+24-02-2026,Zomato 24 Feb,Zomato,216.0,Food & Dining
+24-03-2026,Zomato 24 Mar,Zomato,560.0,Food & Dining
+24-03-2026,McDonalds 24 Mar,McDonalds,275.0,Food & Dining
+24-03-2026,Reliance Fresh 24 Mar,Reliance Fresh,2435.0,Groceries
+24-03-2026,FD Deposit 24 Mar,FD Deposit,7960.0,Transfers
+24-03-2026,Practo 24 Mar,Practo,414.0,Healthcare
+24-03-2026,Dominos 24 Mar,Dominos,744.0,Food & Dining
+24-03-2026,Zomato 24 Mar,Zomato,611.0,Food & Dining
+24-03-2026,Steam 24 Mar,Steam,354.0,Entertainment
+24-04-2026,Burger King 24 Apr,Burger King,281.0,Food & Dining
+24-04-2026,Local Grocer 24 Apr,Local Grocer,204.0,Groceries
+24-04-2026,Airtel Recharge 24 Apr,Airtel Recharge,424.0,Bills & Utilities
+24-04-2026,Metro Card 24 Apr,Metro Card,70.0,Transport
+24-04-2026,Zomato 24 Apr,Zomato,574.0,Food & Dining
+24-04-2026,Amazon Prime 24 Apr,Amazon Prime,419.0,Subscriptions
+24-04-2026,Decathlon 24 Apr,Decathlon,3142.0,Shopping
+24-04-2026,Society Maintenance 24 Apr,Society Maintenance,2876.0,Bills & Utilities
+24-05-2026,DMart 24 May,DMart,1113.0,Groceries
+24-05-2026,Swiggy 24 May,Swiggy,733.0,Food & Dining
+24-05-2026,Metro Card 24 May,Metro Card,45.0,Transport
+24-05-2026,Burger King 24 May,Burger King,306.0,Food & Dining
+24-05-2026,Local Store 24 May,Local Store,1469.0,Shopping
+24-05-2026,Myntra 24 May,Myntra,1927.0,Shopping
+24-05-2026,ATM Fee 24 May,ATM Fee,28.0,Other
+24-05-2026,IKEA 24 May,IKEA,6597.0,Shopping
+24-05-2026,Parking 24 May,Parking,64.0,Transport
+24-05-2026,Rapido 24 May,Rapido,141.0,Transport
+24-05-2026,Water Bill 24 May,Water Bill,816.0,Bills & Utilities
+24-05-2026,Cash Withdrawal 24 May,Cash Withdrawal,1423.0,Other
+24-05-2026,Reliance Fresh 24 May,Reliance Fresh,1938.0,Groceries
+24-05-2026,Uber Pool 24 May,Uber Pool,234.0,Transport
+24-06-2026,Dosa Plaza 24 Jun,Dosa Plaza,142.0,Food & Dining
+24-06-2026,Dosa Plaza 24 Jun,Dosa Plaza,247.0,Food & Dining
+24-06-2026,Dosa Plaza 24 Jun,Dosa Plaza,209.0,Food & Dining
+24-06-2026,Ola 24 Jun,Ola,159.0,Transport
+24-06-2026,Spotify 24 Jun,Spotify,179.0,Subscriptions
+24-06-2026,Metro Card 24 Jun,Metro Card,78.0,Transport
+24-06-2026,Pizza Hut 24 Jun,Pizza Hut,736.0,Food & Dining
+24-06-2026,Metro Card 24 Jun,Metro Card,99.0,Transport
+24-06-2026,Health Checkup 24 Jun,Health Checkup,4756.0,Healthcare
+25-01-2026,Amazon Prime 25 Jan,Amazon Prime,503.0,Subscriptions
+25-01-2026,Mutual Fund 25 Jan,Mutual Fund,8950.0,Transfers
+25-01-2026,Cash Withdrawal 25 Jan,Cash Withdrawal,2760.0,Other
+25-01-2026,Practo 25 Jan,Practo,700.0,Healthcare
+25-01-2026,Pizza Hut 25 Jan,Pizza Hut,495.0,Food & Dining
+25-01-2026,Airtel Recharge 25 Jan,Airtel Recharge,910.0,Bills & Utilities
+25-01-2026,Metro Card 25 Jan,Metro Card,54.0,Transport
+25-01-2026,Dosa Plaza 25 Jan,Dosa Plaza,401.0,Food & Dining
+25-01-2026,Random 25 Jan,Random,449.0,Other
+25-01-2026,Local Cafe 25 Jan,Local Cafe,524.0,Food & Dining
+25-01-2026,Misc Expense 25 Jan,Misc Expense,471.0,Other
+25-01-2026,Dosa Plaza 25 Jan,Dosa Plaza,383.0,Food & Dining
+25-01-2026,Blinkit 25 Jan,Blinkit,517.0,Groceries
+25-01-2026,Electricity Board 25 Jan,Electricity Board,1295.0,Bills & Utilities
+25-02-2026,Swiggy 25 Feb,Swiggy,543.0,Food & Dining
+25-02-2026,Uber 25 Feb,Uber,489.0,Transport
+25-02-2026,Rapido 25 Feb,Rapido,79.0,Transport
+25-02-2026,Subway 25 Feb,Subway,318.0,Food & Dining
+25-02-2026,Rent Payment 25 Feb,Rent Payment,19415.0,Bills & Utilities
+25-02-2026,Zepto 25 Feb,Zepto,383.0,Groceries
+25-02-2026,Practo 25 Feb,Practo,864.0,Healthcare
+25-02-2026,Reliance Fresh 25 Feb,Reliance Fresh,1570.0,Groceries
+25-02-2026,McDonalds 25 Feb,McDonalds,299.0,Food & Dining
+25-03-2026,Dosa Plaza 25 Mar,Dosa Plaza,157.0,Food & Dining
+25-03-2026,Ola 25 Mar,Ola,232.0,Transport
+25-03-2026,Dominos 25 Mar,Dominos,604.0,Food & Dining
+25-03-2026,YouTube Premium 25 Mar,YouTube Premium,176.0,Subscriptions
+25-04-2026,Local Store 25 Apr,Local Store,551.0,Shopping
+25-04-2026,Decathlon 25 Apr,Decathlon,3757.0,Shopping
+25-04-2026,PlayStation Store 25 Apr,PlayStation Store,2036.0,Entertainment
+25-04-2026,ATM Fee 25 Apr,ATM Fee,22.0,Other
+25-04-2026,Broadband Bill 25 Apr,Broadband Bill,1424.0,Bills & Utilities
+25-04-2026,Zomato 25 Apr,Zomato,981.0,Food & Dining
+25-04-2026,Local Grocer 25 Apr,Local Grocer,516.0,Groceries
+25-04-2026,Myntra 25 Apr,Myntra,717.0,Shopping
+25-04-2026,Amazon Prime 25 Apr,Amazon Prime,1109.0,Subscriptions
+25-04-2026,Local Store 25 Apr,Local Store,1481.0,Shopping
+25-05-2026,Metro Card 25 May,Metro Card,32.0,Transport
+25-05-2026,FD Deposit 25 May,FD Deposit,9011.0,Transfers
+25-05-2026,Spotify 25 May,Spotify,146.0,Subscriptions
+25-06-2026,Amazon Prime 25 Jun,Amazon Prime,663.0,Subscriptions
+25-06-2026,Indian Oil 25 Jun,Indian Oil,1059.0,Transport
+25-06-2026,ATM Fee 25 Jun,ATM Fee,22.0,Other
+25-06-2026,Swiggy 25 Jun,Swiggy,587.0,Food & Dining
+25-06-2026,YouTube Premium 25 Jun,YouTube Premium,183.0,Subscriptions
+25-06-2026,Rapido 25 Jun,Rapido,149.0,Transport
+25-06-2026,Burger King 25 Jun,Burger King,504.0,Food & Dining
+25-06-2026,Pizza Hut 25 Jun,Pizza Hut,454.0,Food & Dining
+26-01-2026,Zepto 26 Jan,Zepto,1189.0,Groceries
+26-01-2026,ATM Fee 26 Jan,ATM Fee,25.0,Other
+26-01-2026,Metro Card 26 Jan,Metro Card,62.0,Transport
+26-01-2026,Ajio 26 Jan,Ajio,1445.0,Shopping
+26-01-2026,Random 26 Jan,Random,143.0,Other
+26-01-2026,Zepto 26 Jan,Zepto,1193.0,Groceries
+26-01-2026,Random 26 Jan,Random,210.0,Other
+26-01-2026,Nykaa 26 Jan,Nykaa,1716.0,Shopping
+26-01-2026,Steam 26 Jan,Steam,2130.0,Entertainment
+26-02-2026,Zepto 26 Feb,Zepto,624.0,Groceries
+26-02-2026,Pizza Hut 26 Feb,Pizza Hut,781.0,Food & Dining
+26-02-2026,Zepto 26 Feb,Zepto,643.0,Groceries
+26-02-2026,Ajio 26 Feb,Ajio,1233.0,Shopping
+26-02-2026,UPI to Friend 26 Feb,UPI to Friend,2266.0,Transfers
+26-02-2026,Doctor Visit 26 Feb,Doctor Visit,955.0,Healthcare
+26-03-2026,Reliance Fresh 26 Mar,Reliance Fresh,584.0,Groceries
+26-03-2026,McDonalds 26 Mar,McDonalds,251.0,Food & Dining
+26-03-2026,Ola 26 Mar,Ola,222.0,Transport
+26-03-2026,Subway 26 Mar,Subway,410.0,Food & Dining
+26-04-2026,Blinkit 26 Apr,Blinkit,1080.0,Groceries
+26-04-2026,Jio Recharge 26 Apr,Jio Recharge,352.0,Bills & Utilities
+26-04-2026,PVR 26 Apr,PVR,716.0,Entertainment
+26-04-2026,Zepto 26 Apr,Zepto,765.0,Groceries
+26-04-2026,Uber 26 Apr,Uber,293.0,Transport
+26-04-2026,BPCL 26 Apr,BPCL,2088.0,Transport
+26-04-2026,Dental Clinic 26 Apr,Dental Clinic,1125.0,Healthcare
+26-04-2026,Parking 26 Apr,Parking,96.0,Transport
+26-04-2026,Burger King 26 Apr,Burger King,579.0,Food & Dining
+26-04-2026,Blinkit 26 Apr,Blinkit,1363.0,Groceries
+26-04-2026,Credit Card Payment 26 Apr,Credit Card Payment,8738.0,Transfers
+26-05-2026,Zepto 26 May,Zepto,1036.0,Groceries
+26-05-2026,Blinkit 26 May,Blinkit,1116.0,Groceries
+26-05-2026,Swiggy 26 May,Swiggy,198.0,Food & Dining
+26-05-2026,Swiggy 26 May,Swiggy,581.0,Food & Dining
+26-05-2026,Zepto 26 May,Zepto,787.0,Groceries
+26-05-2026,Local Cafe 26 May,Local Cafe,244.0,Food & Dining
+26-05-2026,Rent Payment 26 May,Rent Payment,10000.0,Bills & Utilities
+26-05-2026,Subway 26 May,Subway,288.0,Food & Dining
+26-06-2026,Nykaa 26 Jun,Nykaa,1648.0,Shopping
+26-06-2026,Nykaa 26 Jun,Nykaa,1158.0,Shopping
+26-06-2026,UPI to Friend 26 Jun,UPI to Friend,1213.0,Transfers
+26-06-2026,Zomato Dining 26 Jun,Zomato Dining,1320.0,Entertainment
+27-01-2026,FD Deposit 27 Jan,FD Deposit,9975.0,Transfers
+27-01-2026,Jio Recharge 27 Jan,Jio Recharge,671.0,Bills & Utilities
+27-01-2026,IKEA 27 Jan,IKEA,2533.0,Shopping
+27-01-2026,Dominos 27 Jan,Dominos,614.0,Food & Dining
+27-01-2026,Electricity Board 27 Jan,Electricity Board,1949.0,Bills & Utilities
+27-01-2026,Pizza Hut 27 Jan,Pizza Hut,884.0,Food & Dining
+27-02-2026,Nykaa 27 Feb,Nykaa,1083.0,Shopping
+27-02-2026,Local Cafe 27 Feb,Local Cafe,238.0,Food & Dining
+27-02-2026,Reliance Fresh 27 Feb,Reliance Fresh,496.0,Groceries
+27-02-2026,Parking 27 Feb,Parking,41.0,Transport
+27-02-2026,Dosa Plaza 27 Feb,Dosa Plaza,161.0,Food & Dining
+27-02-2026,Subway 27 Feb,Subway,322.0,Food & Dining
+27-03-2026,Reliance Fresh 27 Mar,Reliance Fresh,1176.0,Groceries
+27-03-2026,FD Deposit 27 Mar,FD Deposit,13646.0,Transfers
+27-03-2026,Burger King 27 Mar,Burger King,566.0,Food & Dining
+27-03-2026,Uber Pool 27 Mar,Uber Pool,177.0,Transport
+27-03-2026,BPCL 27 Mar,BPCL,1741.0,Transport
+27-03-2026,Zomato 27 Mar,Zomato,243.0,Food & Dining
+27-03-2026,Pizza Hut 27 Mar,Pizza Hut,532.0,Food & Dining
+27-03-2026,Myntra 27 Mar,Myntra,801.0,Shopping
+27-03-2026,Credit Card Payment 27 Mar,Credit Card Payment,14652.0,Transfers
+27-03-2026,Local Grocer 27 Mar,Local Grocer,548.0,Groceries
+27-04-2026,Myntra 27 Apr,Myntra,2447.0,Shopping
+27-04-2026,DMart 27 Apr,DMart,1146.0,Groceries
+27-04-2026,ATM Fee 27 Apr,ATM Fee,25.0,Other
+27-04-2026,Steam 27 Apr,Steam,1976.0,Entertainment
+27-04-2026,Pizza Hut 27 Apr,Pizza Hut,707.0,Food & Dining
+27-04-2026,Practo 27 Apr,Practo,460.0,Healthcare
+27-05-2026,Uber Pool 27 May,Uber Pool,160.0,Transport
+27-05-2026,Ola 27 May,Ola,388.0,Transport
+27-05-2026,Flipkart 27 May,Flipkart,1860.0,Shopping
+27-05-2026,Dosa Plaza 27 May,Dosa Plaza,262.0,Food & Dining
+27-05-2026,Pizza Hut 27 May,Pizza Hut,592.0,Food & Dining
+27-05-2026,Reliance Fresh 27 May,Reliance Fresh,901.0,Groceries
+27-05-2026,Ola 27 May,Ola,382.0,Transport
+27-05-2026,Indian Oil 27 May,Indian Oil,1565.0,Transport
+27-05-2026,Ola 27 May,Ola,277.0,Transport
+27-05-2026,Dental Clinic 27 May,Dental Clinic,1145.0,Healthcare
+27-06-2026,Google One 27 Jun,Google One,289.0,Subscriptions
+27-06-2026,Subway 27 Jun,Subway,513.0,Food & Dining
+27-06-2026,Zepto 27 Jun,Zepto,453.0,Groceries
+27-06-2026,Big Basket 27 Jun,Big Basket,1353.0,Groceries
+27-06-2026,Uber Pool 27 Jun,Uber Pool,161.0,Transport
+27-06-2026,Local Cafe 27 Jun,Local Cafe,310.0,Food & Dining
+27-06-2026,YouTube Premium 27 Jun,YouTube Premium,152.0,Subscriptions
+27-06-2026,Dosa Plaza 27 Jun,Dosa Plaza,235.0,Food & Dining
+27-06-2026,FD Deposit 27 Jun,FD Deposit,12611.0,Transfers
+27-06-2026,Big Basket 27 Jun,Big Basket,1492.0,Groceries
+27-06-2026,Burger King 27 Jun,Burger King,619.0,Food & Dining
+27-06-2026,Flipkart 27 Jun,Flipkart,3677.0,Shopping
+28-01-2026,Reliance Fresh 28 Jan,Reliance Fresh,644.0,Groceries
+28-01-2026,Random 28 Jan,Random,487.0,Other
+28-01-2026,Burger King 28 Jan,Burger King,255.0,Food & Dining
+28-01-2026,Metro Card 28 Jan,Metro Card,71.0,Transport
+28-01-2026,Google One 28 Jan,Google One,139.0,Subscriptions
+28-01-2026,Credit Card Payment 28 Jan,Credit Card Payment,42382.0,Transfers
+28-01-2026,iCloud 28 Jan,iCloud,101.0,Subscriptions
+28-01-2026,PlayStation Store 28 Jan,PlayStation Store,3870.0,Entertainment
+28-02-2026,Rapido 28 Feb,Rapido,31.0,Transport
+28-02-2026,Netflix 28 Feb,Netflix,718.0,Subscriptions
+28-02-2026,Pizza Hut 28 Feb,Pizza Hut,1026.0,Food & Dining
+28-02-2026,BookMyShow 28 Feb,BookMyShow,767.0,Entertainment
+28-02-2026,Dominos 28 Feb,Dominos,1058.0,Food & Dining
+28-03-2026,Subway 28 Mar,Subway,618.0,Food & Dining
+28-03-2026,Reliance Fresh 28 Mar,Reliance Fresh,1601.0,Groceries
+28-03-2026,Zepto 28 Mar,Zepto,921.0,Groceries
+28-03-2026,Ola 28 Mar,Ola,425.0,Transport
+28-03-2026,iCloud 28 Mar,iCloud,100.0,Subscriptions
+28-03-2026,Zepto 28 Mar,Zepto,768.0,Groceries
+28-03-2026,UPI to Friend 28 Mar,UPI to Friend,704.0,Transfers
+28-03-2026,Spotify 28 Mar,Spotify,198.0,Subscriptions
+28-03-2026,Steam 28 Mar,Steam,1140.0,Entertainment
+28-03-2026,Metro Card 28 Mar,Metro Card,93.0,Transport
+28-03-2026,Burger King 28 Mar,Burger King,344.0,Food & Dining
+28-04-2026,Spotify 28 Apr,Spotify,177.0,Subscriptions
+28-04-2026,Amazon Prime 28 Apr,Amazon Prime,848.0,Subscriptions
+28-04-2026,Reliance Fresh 28 Apr,Reliance Fresh,812.0,Groceries
+28-04-2026,Burger King 28 Apr,Burger King,324.0,Food & Dining
+28-04-2026,BPCL 28 Apr,BPCL,1258.0,Transport
+28-04-2026,Zomato 28 Apr,Zomato,363.0,Food & Dining
+28-04-2026,Parking 28 Apr,Parking,75.0,Transport
+28-04-2026,Uber 28 Apr,Uber,301.0,Transport
+28-04-2026,Doctor Visit 28 Apr,Doctor Visit,1176.0,Healthcare
+28-05-2026,Nykaa 28 May,Nykaa,633.0,Shopping
+28-05-2026,Dominos 28 May,Dominos,744.0,Food & Dining
+28-05-2026,Decathlon 28 May,Decathlon,1646.0,Shopping
+28-05-2026,Uber Pool 28 May,Uber Pool,110.0,Transport
+28-05-2026,Airtel Recharge 28 May,Airtel Recharge,697.0,Bills & Utilities
+28-05-2026,Rent Transfer 28 May,Rent Transfer,11112.0,Transfers
+28-05-2026,Amazon Prime 28 May,Amazon Prime,1095.0,Subscriptions
+28-05-2026,Dominos 28 May,Dominos,526.0,Food & Dining
+28-05-2026,Local Store 28 May,Local Store,1853.0,Shopping
+28-06-2026,Practo 28 Jun,Practo,501.0,Healthcare
+28-06-2026,Cash Withdrawal 28 Jun,Cash Withdrawal,2736.0,Other
+28-06-2026,Random 28 Jun,Random,422.0,Other
+28-06-2026,IKEA 28 Jun,IKEA,3644.0,Shopping
+28-06-2026,Nykaa 28 Jun,Nykaa,470.0,Shopping
+28-06-2026,Parking 28 Jun,Parking,33.0,Transport
+28-06-2026,BookMyShow 28 Jun,BookMyShow,555.0,Entertainment
+28-06-2026,Uber Pool 28 Jun,Uber Pool,153.0,Transport
+29-01-2026,Rapido 29 Jan,Rapido,143.0,Transport
+29-01-2026,Hotstar 29 Jan,Hotstar,832.0,Subscriptions
+29-01-2026,Zepto 29 Jan,Zepto,903.0,Groceries
+29-01-2026,Local Grocer 29 Jan,Local Grocer,494.0,Groceries
+29-01-2026,Myntra 29 Jan,Myntra,2714.0,Shopping
+29-03-2026,Swiggy 29 Mar,Swiggy,272.0,Food & Dining
+29-03-2026,Parking 29 Mar,Parking,76.0,Transport
+29-03-2026,Local Cafe 29 Mar,Local Cafe,418.0,Food & Dining
+29-03-2026,Jio Recharge 29 Mar,Jio Recharge,488.0,Bills & Utilities
+29-03-2026,Ajio 29 Mar,Ajio,1328.0,Shopping
+29-03-2026,Parking 29 Mar,Parking,86.0,Transport
+29-03-2026,Local Cafe 29 Mar,Local Cafe,402.0,Food & Dining
+29-03-2026,Broadband Bill 29 Mar,Broadband Bill,1391.0,Bills & Utilities
+29-03-2026,McDonalds 29 Mar,McDonalds,660.0,Food & Dining
+29-03-2026,Random 29 Mar,Random,335.0,Other
+29-03-2026,Zomato Dining 29 Mar,Zomato Dining,1095.0,Entertainment
+29-03-2026,Dosa Plaza 29 Mar,Dosa Plaza,281.0,Food & Dining
+29-04-2026,Society Maintenance 29 Apr,Society Maintenance,2717.0,Bills & Utilities
+29-04-2026,Apollo Pharmacy 29 Apr,Apollo Pharmacy,718.0,Healthcare
+29-04-2026,Pizza Hut 29 Apr,Pizza Hut,467.0,Food & Dining
+29-05-2026,Misc Expense 29 May,Misc Expense,631.0,Other
+29-05-2026,Steam 29 May,Steam,469.0,Entertainment
+29-05-2026,Subway 29 May,Subway,405.0,Food & Dining
+29-05-2026,Apollo Pharmacy 29 May,Apollo Pharmacy,506.0,Healthcare
+29-05-2026,Zepto 29 May,Zepto,1056.0,Groceries
+29-05-2026,Dominos 29 May,Dominos,537.0,Food & Dining
+29-05-2026,Cash Withdrawal 29 May,Cash Withdrawal,1104.0,Other
+29-05-2026,Reliance Fresh 29 May,Reliance Fresh,1253.0,Groceries
+29-06-2026,Local Store 29 Jun,Local Store,1108.0,Shopping
+29-06-2026,IKEA 29 Jun,IKEA,2401.0,Shopping
+29-06-2026,Nykaa 29 Jun,Nykaa,1442.0,Shopping
+29-06-2026,Rent Transfer 29 Jun,Rent Transfer,45332.0,Transfers
+30-01-2026,UPI to Friend 30 Jan,UPI to Friend,452.0,Transfers
+30-01-2026,Dominos 30 Jan,Dominos,355.0,Food & Dining
+30-01-2026,Ajio 30 Jan,Ajio,1090.0,Shopping
+30-01-2026,Cash Withdrawal 30 Jan,Cash Withdrawal,809.0,Other
+30-01-2026,Amazon 30 Jan,Amazon,538.0,Shopping
+30-01-2026,Zomato 30 Jan,Zomato,675.0,Food & Dining
+30-01-2026,McDonalds 30 Jan,McDonalds,377.0,Food & Dining
+30-01-2026,Airtel Recharge 30 Jan,Airtel Recharge,613.0,Bills & Utilities
+30-01-2026,Dominos 30 Jan,Dominos,671.0,Food & Dining
+30-03-2026,Swiggy 30 Mar,Swiggy,363.0,Food & Dining
+30-03-2026,Ajio 30 Mar,Ajio,965.0,Shopping
+30-03-2026,Swiggy 30 Mar,Swiggy,251.0,Food & Dining
+30-03-2026,ATM Fee 30 Mar,ATM Fee,24.0,Other
+30-03-2026,Zepto 30 Mar,Zepto,496.0,Groceries
+30-03-2026,Rapido 30 Mar,Rapido,100.0,Transport
+30-04-2026,PlayStation Store 30 Apr,PlayStation Store,3436.0,Entertainment
+30-04-2026,ATM Fee 30 Apr,ATM Fee,24.0,Other
+30-04-2026,Dental Clinic 30 Apr,Dental Clinic,997.0,Healthcare
+30-04-2026,Airtel Recharge 30 Apr,Airtel Recharge,923.0,Bills & Utilities
+30-04-2026,FD Deposit 30 Apr,FD Deposit,11883.0,Transfers
+30-04-2026,Jio Recharge 30 Apr,Jio Recharge,552.0,Bills & Utilities
+30-05-2026,Rent Transfer 30 May,Rent Transfer,7119.0,Transfers
+30-05-2026,BPCL 30 May,BPCL,2011.0,Transport
+30-05-2026,Subway 30 May,Subway,401.0,Food & Dining
+30-05-2026,Burger King 30 May,Burger King,809.0,Food & Dining
+30-05-2026,Airtel Recharge 30 May,Airtel Recharge,760.0,Bills & Utilities
+30-05-2026,Blinkit 30 May,Blinkit,752.0,Groceries
+30-06-2026,Uber 30 Jun,Uber,309.0,Transport
+30-06-2026,Dominos 30 Jun,Dominos,673.0,Food & Dining
+30-06-2026,Zepto 30 Jun,Zepto,1074.0,Groceries
+30-06-2026,Burger King 30 Jun,Burger King,343.0,Food & Dining
+30-06-2026,McDonalds 30 Jun,McDonalds,322.0,Food & Dining
+30-06-2026,McDonalds 30 Jun,McDonalds,439.0,Food & Dining
+30-06-2026,Rapido 30 Jun,Rapido,81.0,Transport
+30-06-2026,Subway 30 Jun,Subway,402.0,Food & Dining
+30-06-2026,Uber 30 Jun,Uber,486.0,Transport
+30-06-2026,Dominos 30 Jun,Dominos,315.0,Food & Dining
+31-01-2026,IKEA 31 Jan,IKEA,3666.0,Shopping
+31-01-2026,FD Deposit 31 Jan,FD Deposit,8583.0,Transfers
+31-01-2026,Local Grocer 31 Jan,Local Grocer,286.0,Groceries
+31-01-2026,Uber 31 Jan,Uber,124.0,Transport
+31-01-2026,Uber 31 Jan,Uber,391.0,Transport
+31-01-2026,Ajio 31 Jan,Ajio,1303.0,Shopping
+31-01-2026,Reliance Fresh 31 Jan,Reliance Fresh,1237.0,Groceries
+31-01-2026,Local Grocer 31 Jan,Local Grocer,404.0,Groceries
+31-01-2026,Rapido 31 Jan,Rapido,42.0,Transport
+31-03-2026,Uber Pool 31 Mar,Uber Pool,234.0,Transport
+31-03-2026,Hotstar 31 Mar,Hotstar,711.0,Subscriptions
+31-03-2026,Burger King 31 Mar,Burger King,392.0,Food & Dining
+31-03-2026,Blinkit 31 Mar,Blinkit,1138.0,Groceries
+31-03-2026,Swiggy 31 Mar,Swiggy,512.0,Food & Dining
+31-03-2026,Local Cafe 31 Mar,Local Cafe,260.0,Food & Dining
+31-03-2026,Metro Card 31 Mar,Metro Card,51.0,Transport
+31-03-2026,Local Store 31 Mar,Local Store,539.0,Shopping
+31-05-2026,Metro Card 31 May,Metro Card,48.0,Transport
+31-05-2026,Flipkart 31 May,Flipkart,912.0,Shopping
+31-05-2026,ATM Fee 31 May,ATM Fee,25.0,Other
+31-05-2026,UPI to Friend 31 May,UPI to Friend,1622.0,Transfers
+31-05-2026,Local Store 31 May,Local Store,1303.0,Shopping
+31-05-2026,Airtel Recharge 31 May,Airtel Recharge,617.0,Bills & Utilities
+31-05-2026,Airtel Recharge 31 May,Airtel Recharge,546.0,Bills & Utilities
+31-05-2026,Local Cafe 31 May,Local Cafe,409.0,Food & Dining
+31-05-2026,Myntra 31 May,Myntra,1932.0,Shopping
+31-05-2026,Electricity Board 31 May,Electricity Board,1217.0,Bills & Utilities
