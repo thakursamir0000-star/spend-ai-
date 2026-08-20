@@ -1,0 +1,14 @@
+# Install these in the Colab/Kaggle T4 environment (NOT needed locally).
+# Python 3.10/3.11 recommended. On Colab: see train/train_qlora_colab.ipynb.
+transformers>=4.44.0
+peft>=0.12.0
+trl>=0.12.0,<0.13.0
+bitsandbytes>=0.43.0
+accelerate>=0.33.0
+datasets>=2.20.0
+sentencepiece>=0.2.0
+einops>=0.8.0
+pyyaml>=6.0
+scikit-learn>=1.3.0
+pandas>=2.0.0
+numpy>=1.26.0

@@ -81,17 +81,28 @@ def _apply_rule_based(df):
     return df
 
 
-def call_llm(prompt, client, model="llama-3.1-8b-instant"):
-    try:
-        completion = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            response_format={"type": "json_object"}
-        )
-        return completion.choices[0].message.content
-    except Exception as e:
-        return None
+def call_llm(prompt, client, model=None):
+    models_to_try = [
+        model or os.environ.get("GROQ_CATEGORIZER_MODEL", "openai/gpt-oss-20b"),
+        "qwen/qwen3.6-27b",
+        "groq/compound-mini",
+        "openai/gpt-oss-120b",
+    ]
+    seen = set()
+    models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
+    for m in models_to_try:
+        try:
+            completion = client.chat.completions.create(
+                model=m,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                response_format={"type": "json_object"}
+            )
+            return completion.choices[0].message.content
+        except Exception:
+            continue
+    return None
 
 
 def _process_batch(batch, client, cache, use_cache):

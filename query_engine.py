@@ -1,3 +1,4 @@
+import os
 import json
 import streamlit as st
 import pandas as pd
@@ -67,19 +68,33 @@ def _parse_question(question, client):
         quarter_start=quarter_start
     )
 
-    try:
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            response_format={"type": "json_object"}
-        )
-        raw = completion.choices[0].message.content
-        parsed = json.loads(raw)
-        return parsed
-    except Exception as e:
-        st.error(f"Failed to parse question: {e}")
-        return None
+    models_to_try = [
+        os.environ.get("GROQ_QA_MODEL", "openai/gpt-oss-20b"),
+        "qwen/qwen3.6-27b",
+        "groq/compound-mini",
+        "openai/gpt-oss-120b",
+    ]
+    seen = set()
+    models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
+    last_error = None
+    for model in models_to_try:
+        try:
+            completion = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                response_format={"type": "json_object"}
+            )
+            raw = completion.choices[0].message.content
+            parsed = json.loads(raw)
+            return parsed
+        except Exception as e:
+            last_error = e
+            continue
+
+    st.error(f"Failed to parse question: {last_error}")
+    return None
 
 
 def _execute_query(df, query):
@@ -148,14 +163,25 @@ def answer_question(question, df, client):
     result_str = json.dumps(result, indent=2, default=str)
     prompt = PHRASE_PROMPT.format(question=question, result_str=result_str)
 
-    try:
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
-        return completion.choices[0].message.content
-    except Exception:
+    models_to_try = [
+        os.environ.get("GROQ_QA_MODEL", "openai/gpt-oss-20b"),
+        "qwen/qwen3.6-27b",
+        "groq/compound-mini",
+        "openai/gpt-oss-120b",
+    ]
+    seen = set()
+    models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
+    for model in models_to_try:
+        try:
+            completion = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3
+            )
+            return completion.choices[0].message.content
+        except Exception:
+            continue
         if result.get("empty"):
             return "I couldn't find any transactions matching your question."
         if "value" in result:

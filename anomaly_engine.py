@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import streamlit as st
 from datetime import datetime, timedelta
@@ -80,22 +81,31 @@ def detect_anomalies(df, client):
     if anomalies and client:
         anomalies_str = json.dumps(anomalies, indent=2)
         prompt = ANOMALY_PROMPT.format(anomalies_json=anomalies_str)
-        try:
-            completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                response_format={"type": "json_object"}
-            )
-            raw = completion.choices[0].message.content
-            parsed = json.loads(raw)
-            if isinstance(parsed, list):
-                return parsed
-            elif isinstance(parsed, dict) and "anomalies" in parsed:
-                return parsed["anomalies"]
-        except Exception as e:
-            st.warning(f"Could not generate NL anomaly descriptions: {e}")
-            return _fallback_anomalies(anomalies)
+        models_to_try = [
+            os.environ.get("GROQ_QA_MODEL", "openai/gpt-oss-20b"),
+            "qwen/qwen3.6-27b",
+            "groq/compound-mini",
+            "openai/gpt-oss-120b",
+        ]
+        seen = set()
+        models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
+        for model in models_to_try:
+            try:
+                completion = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.3,
+                    response_format={"type": "json_object"}
+                )
+                raw = completion.choices[0].message.content
+                parsed = json.loads(raw)
+                if isinstance(parsed, list):
+                    return parsed
+                elif isinstance(parsed, dict) and "anomalies" in parsed:
+                    return parsed["anomalies"]
+            except Exception:
+                continue
 
     return _fallback_anomalies(anomalies)
 

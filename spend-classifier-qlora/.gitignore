@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+outputs/
+eval/results/
+data/train.jsonl
+data/val.jsonl
+data/test.jsonl
+*.log
+.DS_Store
