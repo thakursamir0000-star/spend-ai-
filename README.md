@@ -1,3 +1,13 @@
+---
+title: AI Spend Insights Bot
+emoji: 💰
+colorFrom: green
+colorTo: blue
+sdk: streamlit
+app_file: app.py
+pinned: false
+---
+
 # AI Spend Insights Bot
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20App-brightgreen)](https://4svb3d4a3caa4seimrygxv.streamlit.app/)
