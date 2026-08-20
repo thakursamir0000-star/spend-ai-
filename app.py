@@ -43,21 +43,7 @@ client = get_client()
 if not client:
     st.warning("GROQ_API_KEY not found. Set it in environment variables or .streamlit/secrets.toml. Categorization and Q&A will be limited.")
 
-@st.cache_resource
-def get_local_classifier():
-    import sys
-    spend_qlora_path = os.path.join(os.path.dirname(__file__), "spend-classifier-qlora")
-    if spend_qlora_path not in sys.path:
-        sys.path.insert(0, spend_qlora_path)
-    from inference.classifier import LocalTransactionClassifier
-    adapter_path = os.path.join(spend_qlora_path, "outputs", "qlora-transaction-classifier")
-    hf_repo = st.secrets.get("LORA_ADAPTER_HF_REPO", "") or os.getenv("LORA_ADAPTER_HF_REPO", "")
-    return LocalTransactionClassifier.from_pretrained(adapter_path=adapter_path, hf_repo=hf_repo)
-
-
 SAMPLE_CSV_PATH = "sample_transactions.csv"
-ADAPTER_EXISTS = os.path.exists(os.path.join(os.path.dirname(__file__), "spend-classifier-qlora", "outputs", "qlora-transaction-classifier"))
-HF_REPO_SET = bool(st.secrets.get("LORA_ADAPTER_HF_REPO", "") or os.getenv("LORA_ADAPTER_HF_REPO", ""))
 
 with st.sidebar:
     st.header("1. Upload Data")
@@ -74,15 +60,7 @@ with st.sidebar:
         raw_df = None
         st.info("Upload a CSV or place 'sample_transactions.csv' in the app directory.")
 
-    st.header("2. AI Categorizer Engine")
-    engine_options = []
-    if ADAPTER_EXISTS or HF_REPO_SET:
-        engine_options.append("💻 Local Fine-Tuned Model (Qwen2.5-1.5B)")
-    engine_options.append("🌐 Groq Cloud API (Llama 3.1)")
-
-    engine_choice = st.selectbox("Select Engine", engine_options, index=0)
-
-    st.header("3. Process Data")
+    st.header("2. Process Data")
     if raw_df is not None and st.button("Clean & Categorize", type="primary"):
         with st.spinner("Cleaning data…"):
             df = clean_dataframe(raw_df)
@@ -92,17 +70,10 @@ with st.sidebar:
             def on_progress(current, total):
                 progress_bar.progress(current / total, text=f"Categorized {current}/{total} transactions")
 
-            if "Local Fine-Tuned" in engine_choice:
-                with st.spinner("Running local fine-tuned model..."):
-                    try:
-                        clf = get_local_classifier()
-                        df = clf.categorize_batch(df, progress_callback=on_progress)
-                    except Exception as e:
-                        st.error(f"Error running local model: {e}")
-            elif client:
+            if client:
                 df = categorize_batch(df, client, progress_callback=on_progress)
             else:
-                st.error("Groq client not configured. Set GROQ_API_KEY or select Local Model.")
+                st.error("Groq client not configured. Set GROQ_API_KEY.")
 
             progress_bar.empty()
             status_text.empty()
@@ -111,11 +82,11 @@ with st.sidebar:
             st.session_state.messages = []
             st.rerun()
 
-    st.header("4. About")
+    st.header("3. About")
     st.markdown("""
     **AI Spend Insights Bot** analyzes your transaction data using LLMs.
     
-    - Auto-categorizes expenses (Local QLoRA or Groq)
+    - Auto-categorizes expenses (Groq Cloud)
     - Detects spending anomalies
     - Answers natural-language questions
     """)
