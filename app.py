@@ -51,11 +51,13 @@ def get_local_classifier():
         sys.path.insert(0, spend_qlora_path)
     from inference.classifier import LocalTransactionClassifier
     adapter_path = os.path.join(spend_qlora_path, "outputs", "qlora-transaction-classifier")
-    return LocalTransactionClassifier.from_pretrained(adapter_path=adapter_path)
+    hf_repo = st.secrets.get("LORA_ADAPTER_HF_REPO", "") or os.getenv("LORA_ADAPTER_HF_REPO", "")
+    return LocalTransactionClassifier.from_pretrained(adapter_path=adapter_path, hf_repo=hf_repo)
 
 
 SAMPLE_CSV_PATH = "sample_transactions.csv"
 ADAPTER_EXISTS = os.path.exists(os.path.join(os.path.dirname(__file__), "spend-classifier-qlora", "outputs", "qlora-transaction-classifier"))
+HF_REPO_SET = bool(st.secrets.get("LORA_ADAPTER_HF_REPO", "") or os.getenv("LORA_ADAPTER_HF_REPO", ""))
 
 with st.sidebar:
     st.header("1. Upload Data")
@@ -74,7 +76,7 @@ with st.sidebar:
 
     st.header("2. AI Categorizer Engine")
     engine_options = []
-    if ADAPTER_EXISTS:
+    if ADAPTER_EXISTS or HF_REPO_SET:
         engine_options.append("💻 Local Fine-Tuned Model (Qwen2.5-1.5B)")
     engine_options.append("🌐 Groq Cloud API (Llama 3.1)")
 

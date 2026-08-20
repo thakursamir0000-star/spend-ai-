@@ -30,22 +30,54 @@ SYSTEM_PROMPT = (
 DEFAULT_BASE = "Qwen/Qwen2.5-1.5B-Instruct"
 
 
+def _resolve_adapter_path(adapter_path, hf_repo=None):
+    """Return a local directory containing the adapter weights.
+
+    If *hf_repo* is provided (e.g. ``"username/my-qlora-adapter"``) the files
+    are downloaded from HuggingFace Hub and a temporary local path is returned.
+    Otherwise *adapter_path* is returned as-is.
+    """
+    if hf_repo:
+        from huggingface_hub import hf_hub_download
+        import json
+
+        repo_id = hf_repo
+        filenames = [
+            "adapter_config.json",
+            "adapter_model.safetensors",
+            "tokenizer.json",
+            "vocab.json",
+            "merges.txt",
+            "special_tokens_map.json",
+            "tokenizer_config.json",
+        ]
+        local_dir = None
+        for fn in filenames:
+            path = hf_hub_download(repo_id=repo_id, filename=fn)
+            if local_dir is None:
+                local_dir = os.path.dirname(path)
+        return local_dir
+    return adapter_path
+
+
 class LocalTransactionClassifier:
     def __init__(self, base_model=DEFAULT_BASE, adapter_path="outputs/qlora-transaction-classifier",
-                 batch_size=8, device="auto"):
+                 hf_repo=None, batch_size=8, device="auto"):
         self.batch_size = batch_size
         self._tokenizer = None
         self._model = None
         self._base_model = base_model
         self._adapter_path = adapter_path
+        self._hf_repo = hf_repo
         self._device = device
 
     @classmethod
     def from_pretrained(cls, adapter_path="outputs/qlora-transaction-classifier",
-                        base_model=None, batch_size=8):
+                        base_model=None, hf_repo=None, batch_size=8):
         clf = cls(
             base_model=os.getenv("BASE_MODEL", base_model or DEFAULT_BASE),
             adapter_path=os.getenv("LORA_ADAPTER_PATH", adapter_path),
+            hf_repo=hf_repo or os.getenv("LORA_ADAPTER_HF_REPO", ""),
             batch_size=batch_size,
         )
         clf._load()
@@ -67,7 +99,8 @@ class LocalTransactionClassifier:
                 device_map="auto",
             )
         model = AutoModelForCausalLM.from_pretrained(self._base_model, **load_kwargs)
-        self._model = PeftModel.from_pretrained(model, self._adapter_path)
+        resolved = _resolve_adapter_path(self._adapter_path, self._hf_repo)
+        self._model = PeftModel.from_pretrained(model, resolved)
         self._model.eval()
         self._has_cuda = has_cuda
 
