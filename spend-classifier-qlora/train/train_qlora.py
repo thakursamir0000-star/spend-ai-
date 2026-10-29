@@ -18,10 +18,9 @@ from pathlib import Path
 import pandas as pd
 import torch
 import yaml
-
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
-from peft import LoraConfig, get_peft_model
 from datasets import Dataset
+from peft import LoraConfig, get_peft_model
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
 from trl import SFTTrainer
 
 CATEGORIES = [
@@ -37,7 +36,7 @@ SYSTEM_PROMPT = (
 
 
 def load_jsonl(path):
-    rows = [json.loads(l) for l in Path(path).read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines() if line.strip()]
     return Dataset.from_pandas(pd.DataFrame(rows))
 
 

@@ -21,10 +21,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+from peft import PeftModel
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-
-from peft import PeftModel
 
 CATEGORIES = [
     "Food & Dining", "Groceries", "Transport", "Shopping", "Subscriptions",
@@ -76,7 +75,7 @@ def main():
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
 
-    rows = [json.loads(l) for l in Path(args.test).read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [json.loads(line) for line in Path(args.test).read_text(encoding="utf-8").splitlines() if line.strip()]
     if args.limit:
         rows = rows[:args.limit]
     gold = [r["output"].strip() for r in rows]

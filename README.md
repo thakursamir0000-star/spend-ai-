@@ -1,35 +1,63 @@
 # AI Spend Insights Bot
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20App-brightgreen)](https://4svb3d4a3caa4seimrygxv.streamlit.app/)
+[![CI](https://github.com/thakursamir0000-star/spend-ai-/actions/workflows/ci.yml/badge.svg)](https://github.com/thakursamir0000-star/spend-ai-/actions/workflows/ci.yml)
 
-A personal finance assistant that analyzes bank/UPI transaction data using LLMs. Upload a CSV, get auto-categorized spending insights, anomaly detection, and natural-language Q&A — all powered by a multi-model AI backend with automatic failover.
+A personal finance assistant that analyzes bank/UPI transaction data using LLMs. Upload a CSV, get auto-categorized spending insights, anomaly detection, and natural-language Q&A — with every number computed in pandas, personal identifiers masked before anything reaches the LLM, and a test suite plus an evaluation script that measure it.
 
 ## Features
 
-- **CSV Upload** — flexible column auto-detection (date, amount, description, merchant, category)
-- **Auto-Categorization** — rule-based merchant matching + parallel batched LLM categorization with caching
-- **Anomaly Detection** — flags category spend spikes (>50% vs 3-month rolling average) and new recurring merchants
-- **Interactive Dashboard** — category pie chart, monthly spend trend, category breakdown over time, top merchants bar chart
-- **NL Q&A** — ask questions in plain English, e.g. *"How much did I spend on food last quarter?"* with a query-then-phrase architecture that prevents hallucinated numbers
-- **QLoRA Fine-Tuning** *(optional)* — train a local Qwen2.5-1.5B classifier for offline, near-free categorization at 94.7% accuracy
+- **Bank-statement aware CSV parsing** — auto-detects date / amount / description / merchant columns, signed amounts (`Cr`/`Dr`, `+`/`-`, brackets), separate *Withdrawal* / *Deposit* columns and DR/CR type columns. Salary and refunds are tracked as income, not spending.
+- **Hybrid categorization** — valid labels from the file → whole-word keyword rules → per-transaction cache → batched, de-duplicated LLM calls. Every row records where its label came from.
+- **Privacy by default** — UPI IDs, phone numbers, emails and card/account/reference numbers are masked before text is sent to the LLM.
+- **Anomaly detection** — category spend spikes (>50% and ≥₹500 above the 3-month average) and new recurring merchants, measured from the latest date in your data.
+- **Interactive dashboard** — spend / income / net metrics, category pie, monthly trend, category breakdown over time, top merchants.
+- **NL Q&A with receipts** — ask *"How much did I spend on food last quarter?"*; the answer comes with a "How this was computed" panel showing the exact filters and result.
+- **QLoRA fine-tuning** *(optional sub-project)* — a local Qwen2.5-1.5B classifier for offline categorization; see [evaluation status](#qlora-fine-tuned-model-optional).
 
 ## Architecture
 
-```
-CSV Upload → Data Cleaner → Categorizer (rules + LLM) → Anomaly Engine → Dashboard + NL Q&A
-                                  ↓ (optional)
-                      QLoRA Fine-Tuned Local Model
+```mermaid
+flowchart LR
+    CSV[CSV upload] --> C[data_cleaner<br/>columns, signed amounts,<br/>debit / credit]
+    C --> K[categorizer]
+    K -->|credits| I[Income]
+    K -->|file labels| E[existing]
+    K -->|keyword rules| R[rules]
+    K -->|seen before| CA[cache]
+    K -->|still unknown| M[privacy.mask_pii] --> L[llm_client<br/>Groq + failover]
+    K --> D[Dashboard]
+    K --> A[anomaly_engine<br/>pandas, optional LLM wording]
+    K --> Q[query_engine]
+    Q -->|question → JSON query| L
+    Q -->|execute| P[pandas]
+    P -->|result → sentence| L
 ```
 
-**Key design decisions:**
+**Key design decisions**
 
-1. **The LLM never computes totals directly.** It parses the user's question into structured filters, code executes the pandas query, and the LLM only phrases the real result. Same retrieval-before-generation principle as RAG.
-2. **Automatic model failover.** Every LLM call cycles through a prioritized list of models. If the primary model is unavailable (rate-limited, down), the next one picks up — zero user intervention.
-3. **Hybrid categorization.** Rule-based matching runs first (instant, free). Only uncategorized transactions go to the LLM, saving API calls and latency.
+1. **The LLM never computes numbers.** It turns the question into a structured query, pandas executes it, and the LLM only phrases the result. If phrasing fails, a deterministic template answers instead.
+2. **Cheapest signal first.** Credits, existing labels, rules and the cache run before any API call; identical transactions share one LLM slot.
+3. **Relative dates follow the data.** "Last month" means the month before your latest transaction, so historical statements work.
+4. **One LLM gateway.** `llm_client.py` owns the model failover order and logs every failed model instead of silently skipping it.
+5. **UI-free core.** The cleaning, categorization, anomaly and Q&A modules don't import Streamlit, so they are unit-tested directly.
+
+## Evaluation
+
+Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm` (needs `GROQ_API_KEY`).
+
+| Evaluation | Rows | Accuracy | Macro F1 |
+|---|---|---|---|
+| Categorization, rules only — sample data, labels hidden | 1,417 | 0.905 | 0.841 |
+| Categorization, rules only — bank-style descriptions, merchants unseen in training* | 776 | 0.799 | 0.751 |
+| Categorization, rules + LLM | — | *run `--with-llm`* | |
+| NL Q&A — computed number matches pandas ground truth (14 questions) | — | *run `--with-llm`* | |
+
+\* the held-out test set produced by `spend-classifier-qlora/train/build_dataset.py`; pass it with `--test-jsonl`.
 
 ## Models & LLM Strategy
 
-The app uses the **Groq SDK** as a unified gateway to multiple models, with automatic failover:
+All LLM calls go through the **Groq SDK** with automatic failover:
 
 | Priority | Model | Role |
 |---|---|---|
@@ -38,109 +66,60 @@ The app uses the **Groq SDK** as a unified gateway to multiple models, with auto
 | 3 (Fallback) | `groq/compound-mini` | Lightweight fallback |
 | 4 (Fallback) | `openai/gpt-oss-120b` | Heavy-duty last resort |
 
-> **Override:** Set `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` environment variables to use different primary models for categorization and Q&A respectively.
+> **Override:** `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` set the primary model per task; `GROQ_FALLBACK_MODELS` (comma-separated) replaces the fallback list. Failed models are logged, so a retired model ID shows up in the logs.
 
-### QLoRA Fine-Tuned Model *(Optional — Offline Categorization)*
+### QLoRA Fine-Tuned Model *(optional)*
 
-The `spend-classifier-qlora/` sub-project trains a **Qwen2.5-1.5B-Instruct** model with 4-bit QLoRA for transaction categorization:
+The `spend-classifier-qlora/` sub-project fine-tunes **Qwen2.5-1.5B-Instruct** with 4-bit QLoRA for transaction categorization.
 
-| Approach | Accuracy | Macro F1 | Latency | Cost per 1k txns |
-|---|---|---|---|---|
-| Rules only | 0.739 | 0.708 | instant | $0 |
-| Rules + LLM API | 0.778 | 0.735 | ~656 ms/txn | ~$0.002 |
-| **QLoRA fine-tuned (local)** | **0.947** | **0.928** | ~45 ms (GPU) | ~$0 |
+**Status: being re-evaluated.** An audit found that the earlier 94.7% accuracy came from a leaky split (every test merchant, and copies of 560 of 567 test transactions, were also in training) and that the LLM baseline was sent the gold labels. Both bugs are fixed — the dataset is now split by merchant — and the model needs to be retrained on the new split. Current honest baseline to beat: **rules 0.799 accuracy on unseen merchants**. Details in [`spend-classifier-qlora/README.md`](spend-classifier-qlora/README.md).
 
-Toggle between modes with a single env var:
-```
-CATEGORIZER_MODE=groq    # default: rules + LLM API
-CATEGORIZER_MODE=local   # fine-tuned model, offline, ~free
-```
-
-See [`spend-classifier-qlora/README.md`](spend-classifier-qlora/README.md) for dataset prep, training, evaluation, and integration details.
-
-## Tech Stack
-
-| Layer | Choice |
-|---|---|
-| Frontend | Streamlit |
-| Charts | Plotly |
-| Data Processing | Pandas |
-| LLM Gateway | Groq SDK (multi-model) |
-| Primary Models | GPT-OSS-20B (categorization + Q&A), Qwen 3.6-27B, Compound-Mini, GPT-OSS-120B (fallbacks) |
-| Fine-Tuning | HuggingFace Transformers + PEFT + TRL + bitsandbytes (QLoRA) |
-| Fine-Tuned Model | Qwen2.5-1.5B-Instruct (4-bit NF4) |
+The deployed app uses the Groq path; switching to the local model requires the one-line swap described in the sub-project README.
 
 ## Setup
 
-### 1. Install Dependencies
-
 ```bash
 pip install -r requirements.txt
-```
 
-### 2. Configure API Key
-
-```bash
-# Option 1: Environment variable
+# API key — environment variable or .streamlit/secrets.toml
 set GROQ_API_KEY=gsk_...
 
-# Option 2: Streamlit secrets (.streamlit/secrets.toml)
-echo 'GROQ_API_KEY = "gsk_..."' > .streamlit/secrets.toml
-```
-
-### 3. (Optional) Override Models
-
-```bash
-set GROQ_CATEGORIZER_MODEL=openai/gpt-oss-20b
-set GROQ_QA_MODEL=openai/gpt-oss-20b
-```
-
-### 4. Run
-
-```bash
 streamlit run app.py
 ```
+
+Without an API key the app still runs: categorization uses rules only and Q&A is disabled.
+
+Optional settings: `MASK_PII=false` turns off masking (debugging only); `GROQ_*_MODEL` as above.
+
+## Testing
+
+```bash
+pip install -r requirements-dev.txt
+ruff check .
+pytest
+```
+
+The tests use a fake LLM client, so they need no network or API key. They cover amount/direction parsing, bank column formats, rule matching, cache behavior, LLM failover, PII masking, Q&A filters and anomaly detection. CI runs lint, tests and the offline evaluation on Python 3.11 (pandas 2) and 3.12 (pandas 3) for every push and pull request.
 
 ## Usage
 
 1. Upload a transaction CSV (or use the included `sample_transactions.csv`)
-2. Click **Clean & Categorize** — rules run first, then uncategorized transactions go to the LLM in parallel batches
-3. Explore the **Dashboard** tab for interactive charts
+2. Click **Clean & Categorize** — the sidebar shows how many labels came from your file, rules, cache or the LLM
+3. Explore the **Dashboard** tab
 4. Click **Detect Anomalies** for spending flags and new recurring merchant alerts
-5. Ask questions in the **Ask AI** tab (e.g. *"What's my biggest expense this month?"*)
+5. Ask questions in the **Ask AI** tab and open **How this was computed** to check the numbers
 
 ### CSV Format
 
-Any CSV with date, amount, and description/merchant columns works. The parser auto-detects common column names (including Indian bank statement formats). If a `Category` column exists, it's used directly — no LLM call needed.
+Any CSV with a date column, plus either one amount column or separate debit/credit (withdrawal/deposit) columns. Descriptions and merchants are optional but improve categorization. A column named `Category` is used when its values are among the 10 categories below; a bank `Type` column with DR/CR values sets the transaction direction.
 
-### 10 Spending Categories
+### Categories
 
-`Food & Dining` · `Groceries` · `Transport` · `Shopping` · `Subscriptions` · `Bills & Utilities` · `Entertainment` · `Healthcare` · `Transfers` · `Other`
-
-## How It Works
-
-### Categorization Pipeline
-
-1. **Rule-based matching** — 35+ merchant keywords mapped to categories (instant, free)
-2. **LLM batch categorization** — uncategorized transactions sent to the LLM in batches of 150, with 3 parallel workers
-3. **Caching** — results are MD5-hashed and cached to `categorization_cache.json` to avoid redundant API calls
-
-### Anomaly Detection
-
-- **Category spikes** — flags any category where current-month spend exceeds the 3-month rolling average by >50%
-- **New recurring merchants** — identifies merchants with 2+ transactions in the last 60 days that didn't appear before
-
-### Natural Language Q&A
-
-A two-phase architecture that guarantees accurate numbers:
-
-1. **Parse** — LLM converts the question into a structured filter (category, date range, aggregation type)
-2. **Execute** — Pandas runs the actual query on the data
-3. **Phrase** — LLM turns the factual result into a friendly sentence
+Spending: `Food & Dining` · `Groceries` · `Transport` · `Shopping` · `Subscriptions` · `Bills & Utilities` · `Entertainment` · `Healthcare` · `Transfers` · `Other`. Money received is labelled `Income`.
 
 ## Sample Data
 
-`generate_sample_data.py` creates 6 months (Jan–Jun 2026) of synthetic UPI/bank transactions across 10 categories with realistic patterns (weekend dining spikes, monthly subscriptions, holiday effects). Run it to regenerate:
+`generate_sample_data.py` creates synthetic UPI/bank transactions for Jan–May 2026 across 10 categories with realistic patterns (weekend dining spikes, monthly subscriptions, holiday effects):
 
 ```bash
 python generate_sample_data.py
@@ -149,32 +128,31 @@ python generate_sample_data.py
 ## Project Structure
 
 ```
-├── app.py                      # Streamlit UI — 3 tabs (Dashboard, Anomalies, Ask AI)
-├── data_cleaner.py             # CSV parsing, column auto-detection, amount/date normalization
-├── categorizer.py              # Rule-based + LLM categorization with caching & parallel batches
-├── anomaly_engine.py           # Statistical anomaly detection + LLM-phrased explanations
-├── query_engine.py             # NL question → structured query → pandas execution → answer
-├── generate_sample_data.py     # Synthetic transaction data generator (6 months, 10 categories)
-├── sample_transactions.csv     # Pre-generated sample data (~1,400 transactions)
-├── requirements.txt            # Runtime dependencies
-├── .streamlit/
-│   └── secrets.toml            # API key config (gitignored)
+├── app.py                      # Streamlit UI — Dashboard, Anomalies, Ask AI
+├── data_cleaner.py             # Column detection, signed amounts, debit/credit, dates
+├── categorizer.py              # Income → file labels → rules → cache → LLM
+├── anomaly_engine.py           # Spike / new-merchant detection, optional LLM wording
+├── query_engine.py             # Question → JSON query → pandas → answer
+├── llm_client.py               # Groq calls with logged model failover
+├── privacy.py                  # PII masking before LLM calls
+├── evaluate.py                 # Categorization + Q&A evaluation, prints README table
+├── tests/                      # pytest suite (fake LLM client, no network)
+├── .github/workflows/ci.yml    # Lint, tests, offline evaluation
+├── generate_sample_data.py     # Synthetic transaction generator
+├── sample_transactions.csv     # Pre-generated sample data (1,417 transactions)
+├── requirements.txt / requirements-dev.txt
 └── spend-classifier-qlora/     # QLoRA fine-tuning sub-project
-    ├── data/                   # train/val/test JSONL splits
-    ├── train/                  # Dataset builder, config, training scripts + Colab notebook
+    ├── train/                  # Dataset builder (merchant split), config, training + Colab notebook
     ├── eval/                   # Baseline & fine-tuned model evaluation
-    ├── inference/              # Local classifier + integration router
-    ├── outputs/                # Trained adapter weights
-    ├── requirements.txt        # Inference dependencies
-    └── requirements-train.txt  # Training dependencies (Colab/T4)
+    └── inference/              # Local classifier + integration router
 ```
 
 ## Limitations
 
-- **Synthetic data** — sample transactions come from a generator, not real bank exports. Real-world generalization to novel merchants is unproven.
-- **10 fixed categories** — merchants outside the training distribution may default to `Other`.
-- **Single-label assumption** — each transaction gets exactly one category.
-- **API dependency** — categorization and Q&A require a valid Groq API key (unless using the local fine-tuned model).
+- **Synthetic data** — sample transactions come from a generator, not real bank exports; the held-out evaluation uses only 10 unseen merchants.
+- **Masking is pattern-based** — it catches identifiers (UPI IDs, phone, account numbers), not personal names written as plain text.
+- **10 fixed spending categories, single label** per transaction.
+- **API dependency** — LLM categorization and Q&A need a Groq API key.
 
 ## License
 
