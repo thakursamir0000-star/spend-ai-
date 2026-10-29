@@ -14,7 +14,41 @@ def test_failover_moves_to_next_model(fake_client):
 
     client = fake_client(responder)
     assert chat(client, "hi") == "ok"
-    assert [c["model"] for c in client.calls][:2] == ["openai/gpt-oss-20b", "qwen/qwen3.6-27b"]
+    assert [c["model"] for c in client.calls][:2] == ["openai/gpt-oss-20b", "openai/gpt-oss-120b"]
+
+
+class MissingModel(Exception):
+    status_code = 404
+
+
+def test_missing_model_is_skipped_after_first_404(fake_client):
+    def responder(kwargs):
+        if kwargs["model"] == "openai/gpt-oss-20b":
+            return MissingModel("The model does not exist (model_not_found)")
+        return "ok"
+
+    client = fake_client(responder)
+    assert chat(client, "first") == "ok"
+    assert chat(client, "second") == "ok"
+    models = [c["model"] for c in client.calls]
+    assert models.count("openai/gpt-oss-20b") == 1
+    assert "openai/gpt-oss-20b" not in candidate_models()
+
+
+def test_other_errors_are_retried_next_time(fake_client):
+    client = fake_client(lambda kwargs: RuntimeError("rate limited"))
+    chat(client, "first")
+    assert "openai/gpt-oss-20b" in candidate_models()
+
+
+def test_low_reasoning_effort_only_for_gpt_oss(fake_client, monkeypatch):
+    monkeypatch.setenv("GROQ_FALLBACK_MODELS", "llama-3.1-8b-instant")
+    client = fake_client(lambda kwargs: RuntimeError("down") if "gpt-oss" in kwargs["model"] else "{}")
+    chat_json(client, "hi")
+    gpt_oss, llama = client.calls
+    assert gpt_oss["reasoning_effort"] == "low"
+    assert "reasoning_effort" not in llama
+    assert llama["response_format"] == {"type": "json_object"}
 
 
 def test_all_models_failing_returns_none(fake_client):

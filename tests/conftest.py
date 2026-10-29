@@ -49,8 +49,11 @@ def fake_client():
 
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
+    from llm_client import reset_unavailable_models
+
     for var in ("GROQ_FALLBACK_MODELS", "GROQ_CATEGORIZER_MODEL", "GROQ_QA_MODEL", "MASK_PII"):
         monkeypatch.delenv(var, raising=False)
+    reset_unavailable_models()
 
 
 @pytest.fixture
