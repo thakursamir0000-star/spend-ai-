@@ -25,7 +25,9 @@ from privacy import mask_pii
 logger = logging.getLogger(__name__)
 
 CACHE_FILE = "categorization_cache.json"
-BATCH_SIZE = 150
+# Small enough that the JSON reply fits the output budget and the request
+# stays under Groq free-tier token-per-minute limits (150 was too large).
+BATCH_SIZE = 40
 MAX_WORKERS = 3
 INCOME_CATEGORY = "Income"
 
