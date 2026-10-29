@@ -59,8 +59,8 @@ QA_CASES = [
      lambda d: d[(d.category == "Entertainment") & (d.month == "2026-04")].amount.sum()),
     ("Break down my Shopping spend by month.",
      lambda d: d[d.category == "Shopping"].groupby("month").amount.sum().to_dict()),
-    ("How much did I spend last month?",  # relative date: anchored to the latest transaction (May 2026)
-     lambda d: d[d.month == "2026-04"].amount.sum()),
+    ("How much did I spend last month?",  # relative date: the month before the latest transaction's month
+     lambda d: d[d.month == str(d.date.max().to_period("M") - 1)].amount.sum()),
 ]
 
 

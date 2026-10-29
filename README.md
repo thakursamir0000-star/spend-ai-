@@ -46,14 +46,18 @@ flowchart LR
 
 Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm` (needs `GROQ_API_KEY`).
 
-| Evaluation | Rows | Accuracy | Macro F1 |
-|---|---|---|---|
-| Categorization, rules only — sample data, labels hidden | 1,417 | 0.905 | 0.841 |
-| Categorization, rules only — bank-style descriptions, merchants unseen in training* | 776 | 0.799 | 0.751 |
-| Categorization, rules + LLM | — | *run `--with-llm`* | |
-| NL Q&A — computed number matches pandas ground truth (14 questions) | — | *run `--with-llm`* | |
+| Evaluation | Rows | Rules only | Rules + LLM | Macro F1 (rules → + LLM) |
+|---|---|---|---|---|
+| Categorization — sample data, labels hidden | 1,417 (213 sent to LLM) | 0.905 | **0.972** | 0.841 → 0.968 |
+| Categorization — bank-style descriptions, merchants unseen in training* | 776 (236 sent to LLM) | 0.799 | **0.890** | 0.751 → 0.872 |
+| NL Q&A — computed number matches pandas ground truth | 14 questions | – | **14 / 14** | median 5.2 s per answer |
 
 \* the held-out test set produced by `spend-classifier-qlora/train/build_dataset.py`; pass it with `--test-jsonl`.
+
+Notes on the LLM run (Groq free tier, `openai/gpt-oss-20b`):
+- It ran before the batch-size and failover fix (batches of 150). Two requests failed — one JSON validation error, one rate limit — and were answered by `openai/gpt-oss-120b`.
+- Q&A first scored 13/14, but the miss was a bug in the evaluation itself: its ground truth for "last month" assumed the data ended in May, while it ends on 30 June. The model's answer (May) was right; with the ground truth fixed and covered by a test, the saved answers score 14/14.
+- 14 questions is a small set; it checks the parse → pandas → phrase path, not every phrasing a user might try.
 
 ## Models & LLM Strategy
 
@@ -121,7 +125,7 @@ Spending: `Food & Dining` · `Groceries` · `Transport` · `Shopping` · `Subscr
 
 ## Sample Data
 
-`generate_sample_data.py` creates synthetic UPI/bank transactions for Jan–May 2026 across 10 categories with realistic patterns (weekend dining spikes, monthly subscriptions, holiday effects):
+`generate_sample_data.py` creates 6 months (Jan–Jun 2026) of synthetic UPI/bank transactions across 10 categories with realistic patterns (weekend dining spikes, monthly subscriptions, holiday effects):
 
 ```bash
 python generate_sample_data.py
