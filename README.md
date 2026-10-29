@@ -62,11 +62,13 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 | Priority | Model | Role |
 |---|---|---|
 | 1 (Primary) | `openai/gpt-oss-20b` | Categorization, Q&A parsing, anomaly phrasing |
-| 2 (Fallback) | `qwen/qwen3.6-27b` | General fallback |
-| 3 (Fallback) | `groq/compound-mini` | Lightweight fallback |
-| 4 (Fallback) | `openai/gpt-oss-120b` | Heavy-duty last resort |
+| 2 (Fallback) | `openai/gpt-oss-120b` | Larger reasoning model |
+| 3 (Fallback) | `llama-3.3-70b-versatile` | Non-reasoning fallback |
+| 4 (Fallback) | `llama-3.1-8b-instant` | Fast last resort |
 
-> **Override:** `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` set the primary model per task; `GROQ_FALLBACK_MODELS` (comma-separated) replaces the fallback list. Failed models are logged, so a retired model ID shows up in the logs.
+> **Override:** `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` set the primary model per task; `GROQ_FALLBACK_MODELS` (comma-separated) replaces the fallback list. Every failure is logged, and a model the API reports as missing (404) is skipped for the rest of the session, so a retired model ID costs one request instead of one per batch. gpt-oss models run with `reasoning_effort="low"` so the JSON answer isn't cut off, and transactions are sent in batches of 40.
+>
+> **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run.
 
 ### QLoRA Fine-Tuned Model *(optional)*
 
