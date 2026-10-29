@@ -1,14 +1,3 @@
----
-title: AI Spend Insights Bot
-emoji: 💰
-colorFrom: green
-colorTo: blue
-sdk: docker
-app_port: 8501
-pinned: false
-short_description: Spend insights from bank/UPI CSVs with LLMs
----
-
 # AI Spend Insights Bot
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20App-brightgreen)](https://4svb3d4a3caa4seimrygxv.streamlit.app/)
@@ -119,7 +108,7 @@ Without an API key the app still runs: categorization uses rules only and Q&A is
 
 Optional settings: `MASK_PII=false` turns off masking (debugging only); `GROQ_*_MODEL` as above.
 
-Or with Docker (the same image the Hugging Face Space builds):
+Or with Docker:
 
 ```bash
 docker build -t spend-ai .
@@ -176,7 +165,7 @@ python generate_sample_data.py
 ├── generate_sample_data.py     # Synthetic transaction generator
 ├── sample_transactions.csv     # Pre-generated sample data (1,417 transactions)
 ├── requirements.txt / requirements-dev.txt
-├── Dockerfile                  # Hugging Face Space / local container
+├── Dockerfile                  # Container image (runs as a non-root user)
 └── spend-classifier-qlora/     # QLoRA fine-tuning sub-project
     ├── train/                  # Dataset builder (merchant split), config, training + Colab notebook
     ├── eval/                   # Baseline & fine-tuned model evaluation
