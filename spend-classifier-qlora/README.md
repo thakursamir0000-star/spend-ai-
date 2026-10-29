@@ -5,36 +5,49 @@ locally fine-tuned open model — and measure it. This project is the "before vs
 story: the same held-out test set, evaluated three ways (rules → rules+Groq → fine-tuned
 local model), with accuracy, latency and cost.
 
-## Results — re-evaluation in progress
+## Results
 
-> **The earlier numbers (rules 0.739 → Groq 0.778 → fine-tuned 0.947) are withdrawn.**
-> An audit of the evaluation found two bugs:
->
-> 1. **Train/test leakage.** Rows were split randomly *after* augmentation, so each test
->    transaction's synthetic copies — and every merchant — were also in training. All 64
->    test merchants appeared in train, and 560 of 567 test rows matched a training
->    transaction (same amount and label). The 0.947 measured memorization, not
->    generalization to new merchants.
-> 2. **Label leakage in the Groq baseline.** The whole test row, including the gold
->    `output` column, was serialized into the prompt.
->
-> Both are fixed: `build_dataset.py` now holds out whole merchants (0 merchants shared
-> between splits), and `baseline_eval.py` sends only description / merchant / amount,
-> with PII masked, exactly like production.
+**Training: complete.** Qwen2.5-1.5B-Instruct with a rank-16 LoRA adapter, 4 epochs in
+4-bit QLoRA (settings in `train/config.yaml`); the adapter is in
+`outputs/qlora-transaction-classifier`.
 
-| Approach | Accuracy | Macro F1 | Latency | Cost per 1k txns |
-|---|---|---|---|---|
-| Rules only (current production rules) | **0.799** | **0.751** | instant | $0 |
-| Rules + Groq | re-run pending | | | |
-| Fine-tuned Qwen2.5-1.5B + LoRA (local) | re-train pending | | 3.2 s/txn measured on CPU | ~$0 |
+### Known merchants, new statement formats
 
-Measured on the merchant-held-out test set: 776 rows from 10 merchants the models never
-see in training (one per category). That is a small number of merchants, so expect
-noticeable variance between seeds; report the mean over a few `--seed` values.
+| Approach | Accuracy | Macro F1 | Latency |
+|---|---|---|---|
+| Rules only (current production rules) | 0.898 | 0.835 | instant |
+| **Fine-tuned Qwen2.5-1.5B + LoRA (local)** | **0.947** | **0.928** | 3.2 s/txn on CPU |
 
-For reference, the current rules score 0.898 accuracy on the old (leaky) test set, up
-from 0.739, after switching to whole-word, longest-keyword-first matching with a
-description fallback.
+Measured on the original 567-row test set. That split was random, so every test merchant
+also appears in training (with different, augmented statement text). These numbers show
+how well each approach reads **known merchants in messy UPI/POS/bank formats** — not how
+it handles merchants it has never seen.
+
+### Unseen merchants
+
+| Approach | Accuracy | Macro F1 |
+|---|---|---|
+| Rules only | 0.799 | 0.751 |
+| Rules + Groq LLM (`openai/gpt-oss-20b`) | **0.890** | **0.872** |
+
+Measured on the merchant-held-out test set: 776 rows from 10 merchants that never appear
+in training (one per category; small, so expect some variance between seeds). The
+fine-tuned adapter isn't scored here: it was trained on the original split, which
+contains these merchants, so a fair unseen-merchant number needs a run on
+`--split merchant` (see [limitations](#honest-limitations)).
+
+### Evaluation audit
+
+An audit of the original evaluation found and fixed two bugs:
+
+1. **Train/test leakage.** Rows were split randomly *after* augmentation, so all 64 test
+   merchants also appeared in training, and 560 of 567 test rows matched a training
+   transaction. That is why the results above are labelled "known merchants", and why
+   `build_dataset.py` now holds out whole merchants by default (0 shared between splits).
+2. **Label leakage in the Groq baseline.** The whole test row, including the gold
+   `output` column, was serialized into the prompt; the old 0.778 Groq number is
+   withdrawn. `baseline_eval.py` now sends only description / merchant / amount, with PII
+   masked, exactly like production.
 
 ## Stack
 
@@ -177,6 +190,11 @@ df = categorize_batch_compat(df, client, progress_callback=on_progress)
 
 ## Honest limitations
 
+- **Unseen-merchant accuracy of the fine-tuned model isn't measured yet.** The adapter
+  was trained before the merchant split existed. Rebuild the data with
+  `python train/build_dataset.py` (merchant split is the default), retrain in Colab and
+  run `eval/eval_finetuned.py` to get it; the rules + LLM result to compare against is
+  0.890.
 - **Small, synthetic-ish dataset.** The 1,418 "real" labels come from the bot's sample
   generator (ground-truth = the generator's merchant→category mapping), not from a
   human-labeled bank export. Real-world generalization to genuinely novel merchants is
