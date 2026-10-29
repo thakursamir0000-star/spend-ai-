@@ -1,7 +1,8 @@
 """Shared Groq chat helper with ordered model failover.
 
 Every LLM call in the app goes through here, so the failover order lives in one
-place and a failing model is logged instead of silently skipped.
+place and a failing model is logged instead of silently skipped. A model the
+API reports as missing (404) is skipped for the rest of the process.
 """
 import json
 import logging
@@ -11,16 +12,19 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_PRIMARY_MODEL = "openai/gpt-oss-20b"
 DEFAULT_FALLBACK_MODELS = [
-    "qwen/qwen3.6-27b",
-    "groq/compound-mini",
     "openai/gpt-oss-120b",
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
 ]
+
+_unavailable_models = set()
 
 
 def candidate_models(primary_env=None):
     """Primary model (from `primary_env` if set) followed by de-duplicated fallbacks.
 
     Fallbacks can be overridden with a comma-separated GROQ_FALLBACK_MODELS.
+    Models already known to be missing are left out.
     """
     primary = os.environ.get(primary_env, "") if primary_env else ""
     fallbacks_env = os.environ.get("GROQ_FALLBACK_MODELS", "")
@@ -28,9 +32,37 @@ def candidate_models(primary_env=None):
 
     models = []
     for m in [primary or DEFAULT_PRIMARY_MODEL, *fallbacks]:
-        if m and m not in models:
+        if m and m not in models and m not in _unavailable_models:
             models.append(m)
     return models
+
+
+def _is_missing_model(error):
+    return getattr(error, "status_code", None) == 404 or "model_not_found" in str(error)
+
+
+def _record_failure(model, error):
+    if _is_missing_model(error):
+        _unavailable_models.add(model)
+        logger.warning("Model %s is not available on this account; skipping it from now on", model)
+    else:
+        logger.warning("Model %s failed: %s", model, error)
+
+
+def _create(client, model, prompt, temperature, json_mode):
+    kwargs = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
+    }
+    if json_mode:
+        kwargs["response_format"] = {"type": "json_object"}
+    if model.startswith("openai/gpt-oss"):
+        # Reasoning tokens share the output budget; keep them short so the
+        # answer itself (often a long JSON list) isn't cut off.
+        kwargs["reasoning_effort"] = "low"
+    completion = client.chat.completions.create(**kwargs)
+    return completion.choices[0].message.content
 
 
 def chat(client, prompt, *, primary_env=None, temperature=0.1, json_mode=False):
@@ -39,21 +71,13 @@ def chat(client, prompt, *, primary_env=None, temperature=0.1, json_mode=False):
         return None
 
     for model in candidate_models(primary_env):
-        kwargs = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": temperature,
-        }
-        if json_mode:
-            kwargs["response_format"] = {"type": "json_object"}
         try:
-            completion = client.chat.completions.create(**kwargs)
-            content = completion.choices[0].message.content
+            content = _create(client, model, prompt, temperature, json_mode)
             if content:
                 return content
             logger.warning("Model %s returned an empty response", model)
         except Exception as e:
-            logger.warning("Model %s failed: %s", model, e)
+            _record_failure(model, e)
     return None
 
 
@@ -64,15 +88,14 @@ def chat_json(client, prompt, *, primary_env=None, temperature=0.1):
 
     for model in candidate_models(primary_env):
         try:
-            completion = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=temperature,
-                response_format={"type": "json_object"},
-            )
-            return json.loads(completion.choices[0].message.content)
+            return json.loads(_create(client, model, prompt, temperature, json_mode=True))
         except json.JSONDecodeError as e:
             logger.warning("Model %s returned invalid JSON: %s", model, e)
         except Exception as e:
-            logger.warning("Model %s failed: %s", model, e)
+            _record_failure(model, e)
     return None
+
+
+def reset_unavailable_models():
+    """Forget which models were missing (used by tests)."""
+    _unavailable_models.clear()

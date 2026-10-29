@@ -46,14 +46,18 @@ flowchart LR
 
 Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm` (needs `GROQ_API_KEY`).
 
-| Evaluation | Rows | Accuracy | Macro F1 |
-|---|---|---|---|
-| Categorization, rules only — sample data, labels hidden | 1,417 | 0.905 | 0.841 |
-| Categorization, rules only — bank-style descriptions, merchants unseen in training* | 776 | 0.799 | 0.751 |
-| Categorization, rules + LLM | — | *run `--with-llm`* | |
-| NL Q&A — computed number matches pandas ground truth (14 questions) | — | *run `--with-llm`* | |
+| Evaluation | Rows | Rules only | Rules + LLM | Macro F1 (rules → + LLM) |
+|---|---|---|---|---|
+| Categorization — sample data, labels hidden | 1,417 (213 sent to LLM) | 0.905 | **0.972** | 0.841 → 0.968 |
+| Categorization — bank-style descriptions, merchants unseen in training* | 776 (236 sent to LLM) | 0.799 | **0.890** | 0.751 → 0.872 |
+| NL Q&A — computed number matches pandas ground truth | 14 questions | – | **14 / 14** | median 5.2 s per answer |
 
 \* the held-out test set produced by `spend-classifier-qlora/train/build_dataset.py`; pass it with `--test-jsonl`.
+
+Notes on the LLM run (Groq free tier, `openai/gpt-oss-20b`):
+- It ran before the batch-size and failover fix (batches of 150). Two requests failed — one JSON validation error, one rate limit — and were answered by `openai/gpt-oss-120b`.
+- Q&A first scored 13/14, but the miss was a bug in the evaluation itself: its ground truth for "last month" assumed the data ended in May, while it ends on 30 June. The model's answer (May) was right; with the ground truth fixed and covered by a test, the saved answers score 14/14.
+- 14 questions is a small set; it checks the parse → pandas → phrase path, not every phrasing a user might try.
 
 ## Models & LLM Strategy
 
@@ -62,11 +66,13 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 | Priority | Model | Role |
 |---|---|---|
 | 1 (Primary) | `openai/gpt-oss-20b` | Categorization, Q&A parsing, anomaly phrasing |
-| 2 (Fallback) | `qwen/qwen3.6-27b` | General fallback |
-| 3 (Fallback) | `groq/compound-mini` | Lightweight fallback |
-| 4 (Fallback) | `openai/gpt-oss-120b` | Heavy-duty last resort |
+| 2 (Fallback) | `openai/gpt-oss-120b` | Larger reasoning model |
+| 3 (Fallback) | `llama-3.3-70b-versatile` | Non-reasoning fallback |
+| 4 (Fallback) | `llama-3.1-8b-instant` | Fast last resort |
 
-> **Override:** `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` set the primary model per task; `GROQ_FALLBACK_MODELS` (comma-separated) replaces the fallback list. Failed models are logged, so a retired model ID shows up in the logs.
+> **Override:** `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` set the primary model per task; `GROQ_FALLBACK_MODELS` (comma-separated) replaces the fallback list. Every failure is logged, and a model the API reports as missing (404) is skipped for the rest of the session, so a retired model ID costs one request instead of one per batch. gpt-oss models run with `reasoning_effort="low"` so the JSON answer isn't cut off, and transactions are sent in batches of 40.
+>
+> **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run.
 
 ### QLoRA Fine-Tuned Model *(optional)*
 
@@ -119,7 +125,7 @@ Spending: `Food & Dining` · `Groceries` · `Transport` · `Shopping` · `Subscr
 
 ## Sample Data
 
-`generate_sample_data.py` creates synthetic UPI/bank transactions for Jan–May 2026 across 10 categories with realistic patterns (weekend dining spikes, monthly subscriptions, holiday effects):
+`generate_sample_data.py` creates 6 months (Jan–Jun 2026) of synthetic UPI/bank transactions across 10 categories with realistic patterns (weekend dining spikes, monthly subscriptions, holiday effects):
 
 ```bash
 python generate_sample_data.py
