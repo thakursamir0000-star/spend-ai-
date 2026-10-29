@@ -1,7 +1,9 @@
 import json
+from types import SimpleNamespace
 
 import pytest
 
+import llm_client
 from llm_client import candidate_models, chat, chat_json
 from privacy import mask_pii
 
@@ -41,14 +43,52 @@ def test_other_errors_are_retried_next_time(fake_client):
     assert "openai/gpt-oss-20b" in candidate_models()
 
 
+class RateLimited(Exception):
+    status_code = 429
+
+    def __init__(self, retry_after):
+        super().__init__("Rate limit reached")
+        self.response = SimpleNamespace(headers={"retry-after": str(retry_after)})
+
+
+def test_default_chain_has_no_retired_models():
+    assert candidate_models() == ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b"]
+
+
+def test_daily_rate_limit_skips_model_until_it_resets(fake_client, monkeypatch):
+    now = [1000.0]
+    monkeypatch.setattr(llm_client.time, "monotonic", lambda: now[0])
+
+    def responder(kwargs):
+        if kwargs["model"] == "openai/gpt-oss-20b":
+            return RateLimited(417)
+        return "ok"
+
+    client = fake_client(responder)
+    assert chat(client, "first") == "ok"
+    assert chat(client, "second") == "ok"
+    assert [c["model"] for c in client.calls].count("openai/gpt-oss-20b") == 1
+    assert "openai/gpt-oss-20b" not in candidate_models()
+
+    now[0] += 418
+    assert candidate_models()[0] == "openai/gpt-oss-20b"
+
+
+def test_short_rate_limit_is_not_remembered(fake_client):
+    # The SDK has already waited this one out; the next call should try the model again.
+    client = fake_client(lambda kwargs: RateLimited(15) if kwargs["model"] == "openai/gpt-oss-20b" else "ok")
+    assert chat(client, "hi") == "ok"
+    assert "openai/gpt-oss-20b" in candidate_models()
+
+
 def test_low_reasoning_effort_only_for_gpt_oss(fake_client, monkeypatch):
-    monkeypatch.setenv("GROQ_FALLBACK_MODELS", "llama-3.1-8b-instant")
+    monkeypatch.setenv("GROQ_FALLBACK_MODELS", "qwen/qwen3.8-27b")
     client = fake_client(lambda kwargs: RuntimeError("down") if "gpt-oss" in kwargs["model"] else "{}")
     chat_json(client, "hi")
-    gpt_oss, llama = client.calls
+    gpt_oss, qwen = client.calls
     assert gpt_oss["reasoning_effort"] == "low"
-    assert "reasoning_effort" not in llama
-    assert llama["response_format"] == {"type": "json_object"}
+    assert "reasoning_effort" not in qwen
+    assert qwen["response_format"] == {"type": "json_object"}
 
 
 def test_all_models_failing_returns_none(fake_client):

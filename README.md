@@ -68,7 +68,8 @@ Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm`
 Notes on the LLM run (29 Oct 2026, current code, Groq free tier, `openai/gpt-oss-20b`):
 - Three batches hit the free tier's 8,000 tokens-per-minute limit and were answered by the fallback `openai/gpt-oss-120b`; every row still got an LLM label.
 - **The Q&A miss is a model parsing error:** for *"Break down my Shopping spend by month"* the model returned a query with no category filter, so pandas summed all spending per month — and the phrased answer still called it "shopping". The **How this was computed** panel shows the empty filter list, which is how a user can catch it. A second run straight after answered it correctly (14/14): with temperature 0.1 answers vary between runs, and with 14 questions one answer moves the score by 7 points.
-- **That second run's categorization numbers aren't reported:** 33 requests were rate-limited and both Llama fallbacks returned 404 (Groq no longer offers them), so 83 of the 236 unseen-merchant rows got no LLM label and fell back to `Other` (the sidebar counts these as "fallback to Other"). On the free tier, results depend on rate-limit headroom.
+- **That second run's categorization numbers aren't reported:** `gpt-oss-20b` hit its daily token cap mid-run and the old Llama fallbacks returned 404 (Groq no longer offers them), so 83 of the 236 unseen-merchant rows got no LLM label and fell back to `Other`. That run is why the fallback chain was fixed (see [Rate limits](#models--llm-strategy)).
+- **Fallback check after the fix:** a third run started with both gpt-oss models at their daily caps. Each was detected and skipped, `qwen/qwen3.8-27b` took over, and Q&A scored 14/14. On the unseen-merchant set, though, qwen's free-tier limit of 1,000 output tokens per minute let only 110 of 236 rows through the parallel batches; the other 126 fell back to `Other` (accuracy 0.822). So once both gpt-oss daily caps are spent the app keeps answering, but a large statement is only partly labelled.
 - An earlier run found a bug in the evaluation itself: the ground truth for "last month" assumed the data ended in May, while it ends on 30 June. It is fixed and covered by a test.
 - 14 questions is a small set; it checks the parse → pandas → phrase path, not every phrasing a user might try.
 
@@ -80,12 +81,13 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 |---|---|---|
 | 1 (Primary) | `openai/gpt-oss-20b` | Categorization, Q&A parsing, anomaly phrasing |
 | 2 (Fallback) | `openai/gpt-oss-120b` | Larger reasoning model |
-| 3 (Fallback) | `llama-3.3-70b-versatile` | Non-reasoning fallback — **no longer offered by Groq** (404 since Oct 2026) |
-| 4 (Fallback) | `llama-3.1-8b-instant` | Fast last resort — **no longer offered by Groq** (404 since Oct 2026) |
+| 3 (Fallback) | `qwen/qwen3.8-27b` | Different model family with its own rate limits; strict JSON, no reasoning text |
 
 > **Override:** `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` set the primary model per task; `GROQ_FALLBACK_MODELS` (comma-separated) replaces the fallback list. Every failure is logged, and a model the API reports as missing (404) is skipped for the rest of the session, so a retired model ID costs one request instead of one per batch. gpt-oss models run with `reasoning_effort="low"` so the JSON answer isn't cut off, and transactions are sent in batches of 40.
 >
-> **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run. It happened again in October 2026, when both Llama fallbacks started returning 404: they are skipped after their first failure, so the working chain is the two gpt-oss models until the list is updated.
+> **Rate limits:** the Groq SDK already waits out a short 429 (it follows the server's `retry-after` up to 60 s, twice). A longer `retry-after` means a per-day token cap — on the free tier that is reached after a few full evaluation runs — so that model is skipped until the cap resets instead of being retried on every batch, and the next model in the chain takes over. Rows that no model labels fall back to `Other` and are counted in the sidebar.
+>
+> **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run. It happened again in October 2026, when Groq stopped offering `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`: the logs showed the 404s on the next evaluation run, and the chain now ends with `qwen/qwen3.8-27b`.
 
 ### QLoRA Fine-Tuned Model *(optional)*
 
