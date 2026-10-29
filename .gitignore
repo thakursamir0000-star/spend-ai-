@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 categorization_cache.json
+eval_results.json
+.venv/
+.pytest_cache/
+.ruff_cache/

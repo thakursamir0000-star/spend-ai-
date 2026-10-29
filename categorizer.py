@@ -1,11 +1,33 @@
-import json
-import os
+"""Transaction categorization pipeline.
+
+Order of precedence, cheapest first:
+  1. credits (money in)          -> "Income", no LLM call
+  2. valid labels from the upload -> kept as-is
+  3. merchant keyword rules       -> instant, free
+  4. per-transaction cache        -> no repeat API calls across runs
+  5. LLM, batched + de-duplicated -> PII is masked before anything leaves the app
+Each row records where its label came from in `category_source`.
+"""
 import hashlib
-import streamlit as st
-import pandas as pd
+import json
+import logging
+import os
+import re
+import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import pandas as pd
+
+from data_cleaner import CREDIT
+from llm_client import chat_json
+from privacy import mask_pii
+
+logger = logging.getLogger(__name__)
+
 CACHE_FILE = "categorization_cache.json"
+BATCH_SIZE = 150
+MAX_WORKERS = 3
+INCOME_CATEGORY = "Income"
 
 CATEGORIES = [
     "Food & Dining", "Groceries", "Transport", "Shopping", "Subscriptions",
@@ -35,6 +57,14 @@ MERCHANT_RULES = {
     "health checkup": "Healthcare", "dental clinic": "Healthcare",
 }
 
+# Longest keyword first so "amazon prime" beats "amazon"; whole-word matching so
+# "ola" doesn't fire on "Coca-Cola" or "Motorola".
+_RULES = [
+    (re.compile(rf"(?<![a-z0-9]){re.escape(keyword)}(?![a-z0-9])"), category)
+    for keyword, category in sorted(MERCHANT_RULES.items(), key=lambda kv: -len(kv[0]))
+]
+_CATEGORY_LOOKUP = {c.lower(): c for c in CATEGORIES}
+
 CATEGORIZATION_PROMPT = """You are a transaction categorizer for a personal finance app. Categorize each transaction into exactly one category.
 
 Categories:
@@ -49,143 +79,184 @@ Categories:
 - Transfers: UPI transfers to friends/family, credit card bill payment, FD, investments
 - Other: anything that doesn't fit above
 
-Respond with ONLY a JSON object with a single key "categories" mapping to an array of objects, each with keys "index" (original position) and "category". No markdown, no explanation.
+Personal identifiers have been replaced with placeholders like <UPI_ID> or <NUMBER>.
+
+Respond with ONLY a JSON object with a single key "categories" mapping to an array of objects, each with keys "index" (the transaction's index) and "category" (one of the category names above, spelled exactly). No markdown, no explanation.
 
 Transactions:
 {transactions_json}"""
 
 
-def _cache_key(transactions_df):
-    subset = transactions_df[['description', 'merchant', 'amount']].sort_values(by=['description', 'merchant', 'amount'])
-    raw = subset.to_json(orient='records')
-    return hashlib.md5(raw.encode()).hexdigest()
+def normalize_category(value):
+    """Map a label onto one of CATEGORIES (case-insensitive), or None."""
+    if not isinstance(value, str):
+        return None
+    return _CATEGORY_LOOKUP.get(value.strip().lower())
 
 
-def _load_cache():
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, 'r') as f:
-            return json.load(f)
-    return {}
-
-
-def _save_cache(cache):
-    with open(CACHE_FILE, 'w') as f:
-        json.dump(cache, f)
-
-
-def _apply_rule_based(df):
-    merchant_lower = df['merchant'].str.lower().str.strip()
-    for keyword, cat in MERCHANT_RULES.items():
-        mask = merchant_lower.str.contains(keyword, na=False)
-        df.loc[mask & (df['category'] == ''), 'category'] = cat
-    return df
-
-
-def call_llm(prompt, client, model=None):
-    models_to_try = [
-        model or os.environ.get("GROQ_CATEGORIZER_MODEL", "openai/gpt-oss-20b"),
-        "qwen/qwen3.6-27b",
-        "groq/compound-mini",
-        "openai/gpt-oss-120b",
-    ]
-    seen = set()
-    models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
-
-    for m in models_to_try:
-        try:
-            completion = client.chat.completions.create(
-                model=m,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1,
-                response_format={"type": "json_object"}
-            )
-            return completion.choices[0].message.content
-        except Exception:
-            continue
+def rule_category(text):
+    """First matching keyword rule for `text`, or None."""
+    text = str(text).lower()
+    for pattern, category in _RULES:
+        if pattern.search(text):
+            return category
     return None
 
 
-def _process_batch(batch, client, cache, use_cache):
-    ckey = _cache_key(batch)
-    if use_cache and ckey in cache:
-        return cache[ckey]
+def _txn_key(description, merchant):
+    raw = f"{str(description).strip().lower()}|{str(merchant).strip().lower()}"
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
 
-    txns_json = batch.reset_index(drop=True).to_json(orient='records')
-    prompt = CATEGORIZATION_PROMPT.format(transactions_json=txns_json)
-    raw = call_llm(prompt, client)
 
-    if not raw:
-        return {idx: "Other" for idx in batch.index}
-
+def _load_cache(path):
     try:
-        parsed = json.loads(raw)
-        if isinstance(parsed, dict):
-            items = parsed.get("categories", parsed)
-            if isinstance(items, dict):
-                items = list(items.values())
-        else:
-            items = parsed
-
-        results = {}
-        if isinstance(items, list):
-            for item in items:
-                pos = item.get("index", 0)
-                if isinstance(pos, int) and pos < len(batch):
-                    results[batch.index[pos]] = item.get("category", "Other")
-        else:
-            results = {idx: "Other" for idx in batch.index}
-
-        if use_cache and results:
-            cache[ckey] = results
-            _save_cache(cache)
-        return results
-    except (json.JSONDecodeError, KeyError, IndexError, TypeError):
-        return {idx: "Other" for idx in batch.index}
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except FileNotFoundError:
+        return {}
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning("Ignoring unreadable cache %s: %s", path, e)
+        return {}
 
 
-def categorize_batch(transactions_df, client, use_cache=True, progress_callback=None):
-    if 'category' not in transactions_df.columns:
-        transactions_df['category'] = ''
+def _save_cache(cache, path):
+    """Write atomically so a crash mid-write can't leave a corrupt cache behind."""
+    directory = os.path.dirname(os.path.abspath(path))
+    fd, tmp_path = tempfile.mkstemp(dir=directory, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(cache, f)
+        os.replace(tmp_path, path)
+    except OSError as e:
+        logger.warning("Could not save cache %s: %s", path, e)
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
 
-    original_col = [c for c in transactions_df.columns if c.lower().replace('_', '') == 'originalcategory']
-    if original_col:
-        has_orig = transactions_df[original_col[0]].str.strip().ne('').fillna(False)
-        if has_orig.any():
-            transactions_df.loc[has_orig, 'category'] = transactions_df.loc[has_orig, original_col[0]]
 
-    transactions_df = _apply_rule_based(transactions_df)
+def _apply_rule_based(df):
+    if 'category_source' not in df.columns:
+        df['category_source'] = ''
+    for col in ('merchant', 'description'):
+        if col not in df.columns:
+            continue
+        pending = df['category'] == ''
+        matches = df.loc[pending, col].fillna('').astype(str).map(rule_category).dropna()
+        df.loc[matches.index, 'category'] = matches
+        df.loc[matches.index, 'category_source'] = 'rule'
+    return df
 
-    uncategorized = transactions_df[transactions_df['category'] == ''].copy()
-    if uncategorized.empty:
+
+def _categorize_with_llm(rows, client):
+    """Categorize a list of {description, merchant, amount} dicts.
+
+    Returns {position: category}; positions the model skipped are left out.
+    """
+    payload = [
+        {
+            "index": i,
+            "description": mask_pii(str(row["description"])),
+            "merchant": mask_pii(str(row["merchant"])),
+            "amount": round(float(row["amount"]), 2),
+        }
+        for i, row in enumerate(rows)
+    ]
+    prompt = CATEGORIZATION_PROMPT.format(transactions_json=json.dumps(payload, ensure_ascii=False))
+    parsed = chat_json(client, prompt, primary_env="GROQ_CATEGORIZER_MODEL", temperature=0.1)
+
+    items = parsed.get("categories") if isinstance(parsed, dict) else parsed
+    results = {}
+    if isinstance(items, list):
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            try:
+                pos = int(item.get("index"))
+            except (TypeError, ValueError):
+                continue
+            if 0 <= pos < len(rows):
+                results[pos] = normalize_category(item.get("category")) or "Other"
+    return results
+
+
+def categorize_batch(transactions_df, client, use_cache=True, progress_callback=None, cache_path=None):
+    """Return a copy of `transactions_df` with `category` and `category_source` filled in.
+
+    `client` may be None, in which case only income/existing/rules/cache are used
+    and anything left over becomes "Other".
+    """
+    cache_path = cache_path or CACHE_FILE
+    df = transactions_df.copy()
+    if 'category' not in df.columns:
+        df['category'] = ''
+    df['category'] = df['category'].fillna('').astype(str)
+    df['category_source'] = ''
+    df.loc[df['category'] != '', 'category_source'] = 'existing'
+
+    if 'direction' in df.columns:
+        income = (df['direction'] == CREDIT) & (df['category'] == '')
+        df.loc[income, 'category'] = INCOME_CATEGORY
+        df.loc[income, 'category_source'] = 'income'
+
+    if 'original_category' in df.columns:
+        original = df['original_category'].map(normalize_category)
+        use = original.notna() & (df['category'] == '')
+        df.loc[use, 'category'] = original[use]
+        df.loc[use, 'category_source'] = 'existing'
+
+    df = _apply_rule_based(df)
+
+    pending = df.index[df['category'] == '']
+    if len(pending) == 0:
         if progress_callback:
             progress_callback(1, 1)
-        st.info("All transactions categorized by rules or existing data.")
-        return transactions_df
+        return df
 
-    cache = _load_cache() if use_cache else {}
-    batch_size = 150
-    total = len(uncategorized)
-    batches = [uncategorized.iloc[i:min(i + batch_size, total)] for i in range(0, total, batch_size)]
+    keys = pd.Series(
+        [_txn_key(d, m) for d, m in zip(df.loc[pending, 'description'], df.loc[pending, 'merchant'])],
+        index=pending,
+    )
+    cache = _load_cache(cache_path) if use_cache else {}
+    resolved = {}
+    for key in keys.unique():
+        cached = normalize_category(cache.get(key)) if use_cache else None
+        if cached:
+            resolved[key] = (cached, 'cache')
 
-    st.info(f"Categorizing {total} transactions via LLM ({len(batches)} batches)...")
-    all_results = {}
+    # One representative row per unique transaction text: repeated charges
+    # (e.g. six identical Netflix payments) cost a single LLM slot.
+    representatives = {}
+    for idx, key in keys.items():
+        if key not in resolved and key not in representatives:
+            representatives[key] = idx
+    unique_keys = list(representatives)
 
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = {executor.submit(_process_batch, b, client, cache, use_cache): b.index[0] for b in batches}
-        done_count = 0
-        for future in as_completed(futures):
-            results = future.result()
-            all_results.update(results)
-            done_count += 1
-            if progress_callback:
-                progress_callback(done_count * batch_size, total)
+    if unique_keys and client is not None:
+        batches = [unique_keys[i:i + BATCH_SIZE] for i in range(0, len(unique_keys), BATCH_SIZE)]
 
-    for idx, cat in all_results.items():
-        transactions_df.at[idx, 'category'] = cat
+        def run(batch_keys):
+            rows = [df.loc[representatives[k], ['description', 'merchant', 'amount']].to_dict() for k in batch_keys]
+            return batch_keys, _categorize_with_llm(rows, client)
 
-    remaining = (transactions_df['category'] == '').sum()
-    if remaining > 0:
-        transactions_df.loc[transactions_df['category'] == '', 'category'] = 'Other'
+        done = 0
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = [executor.submit(run, b) for b in batches]
+            for future in as_completed(futures):
+                batch_keys, results = future.result()
+                for pos, key in enumerate(batch_keys):
+                    if pos in results:
+                        resolved[key] = (results[pos], 'llm')
+                        if use_cache:
+                            cache[key] = results[pos]
+                done += len(batch_keys)
+                if progress_callback:
+                    progress_callback(done, len(unique_keys))
+        if use_cache:
+            _save_cache(cache, cache_path)
+    elif progress_callback:
+        progress_callback(1, 1)
 
-    st.success(f"Categorized {len(transactions_df)} transactions.")
-    return transactions_df
+    labels = keys.map(lambda k: resolved.get(k, ("Other", "fallback")))
+    df.loc[pending, 'category'] = labels.map(lambda pair: pair[0])
+    df.loc[pending, 'category_source'] = labels.map(lambda pair: pair[1])
+    return df
