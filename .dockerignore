@@ -1,0 +1,12 @@
+.git
+.github
+.venv*
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.streamlit/secrets.toml
+categorization_cache.json
+eval_results.json
+tests/
+spend-classifier-qlora/
