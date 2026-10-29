@@ -25,7 +25,8 @@ import pandas as pd
 from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from categorizer import CATEGORIES, CATEGORIZATION_PROMPT, MERCHANT_RULES
+from categorizer import CATEGORIES, CATEGORIZATION_PROMPT, rule_category
+from privacy import mask_pii
 
 try:
     import groq
@@ -44,25 +45,30 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_test(path):
-    rows = [json.loads(l) for l in open(path, encoding="utf-8")]
+    rows = [json.loads(line) for line in open(path, encoding="utf-8")]
     df = pd.DataFrame(rows)
     df["gold"] = df["output"].astype(str).str.strip()
     return df
 
 
 def apply_rules(df):
-    """Mirror categorizer._apply_rule_based: dict-order substring match, first hit wins."""
-    pred = pd.Series("", index=df.index)
-    merchant = df["merchant"].astype(str).str.lower().str.strip()
-    for keyword, cat in MERCHANT_RULES.items():
-        mask = merchant.str.contains(keyword, na=False)
-        pred.loc[mask & (pred == "")] = cat
-    return pred
+    """Use the production rules: merchant first, then description (whole-word, longest keyword first)."""
+    by_merchant = df["merchant"].astype(str).map(rule_category)
+    by_description = df["description"].astype(str).map(rule_category)
+    return by_merchant.fillna(by_description).fillna("")
 
 
 def groq_batch(df, client):
-    """Batch-categorize via Groq, mirroring production batching + JSON parsing."""
-    txns_json = df.reset_index(drop=True).to_json(orient="records")
+    """Batch-categorize via Groq, mirroring production batching + JSON parsing.
+
+    Only the fields production sends are included — never the gold label columns.
+    """
+    payload = [
+        {"index": i, "description": mask_pii(str(r.description)), "merchant": mask_pii(str(r.merchant)),
+         "amount": round(float(r.amount), 2)}
+        for i, r in enumerate(df.itertuples())
+    ]
+    txns_json = json.dumps(payload, ensure_ascii=False)
     prompt = CATEGORIZATION_PROMPT.format(transactions_json=txns_json)
     completion = client.chat.completions.create(
         model="llama-3.1-8b-instant",
@@ -108,7 +114,6 @@ def groq_batch_with_retry(df, client, max_retries=4):
 
 def run_groq(df_uncat, client):
     """Returns (predictions on df_uncat.index, total_usage, elapsed_sec)."""
-    import time
     pred = pd.Series("Other", index=df_uncat.index)
     usage = {"prompt_tokens": 0, "completion_tokens": 0}
     total = len(df_uncat)
@@ -116,7 +121,7 @@ def run_groq(df_uncat, client):
         return pred, usage, 0.0
 
     # Adaptive batch size: keep each request under the free-tier token budget.
-    sample = df_uncat.iloc[[0]].reset_index(drop=True)
+    sample = df_uncat.iloc[[0]][["description", "merchant", "amount"]].reset_index(drop=True)
     per_row_tokens = max(1, int(len(sample.to_json(orient="records")) / 4) + 10)
     header_tokens = int(len(CATEGORIZATION_PROMPT.split("{transactions_json}")[0]) / 4)
     batch_size = max(1, min(BATCH_SIZE, int((MAX_BATCH_TOKENS - header_tokens) / per_row_tokens)))
@@ -195,7 +200,7 @@ def main():
         return
 
     uncat = df[apply_rules(df) == ""].copy()
-    print(f"=== RULE + GROQ BASELINE (production) ===")
+    print("=== RULE + GROQ BASELINE (production) ===")
     print(f"Uncategorized by rules: {len(uncat)} -> sending to Groq in batches of {BATCH_SIZE}")
     client = Groq(api_key=api_key)
     groq_pred, usage, elapsed = run_groq(uncat, client)

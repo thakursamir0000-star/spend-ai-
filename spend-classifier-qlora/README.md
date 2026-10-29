@@ -5,26 +5,36 @@ locally fine-tuned open model — and measure it. This project is the "before vs
 story: the same held-out test set, evaluated three ways (rules → rules+Groq → fine-tuned
 local model), with accuracy, latency and cost.
 
-## TL;DR — what you get
+## Results — re-evaluation in progress
+
+> **The earlier numbers (rules 0.739 → Groq 0.778 → fine-tuned 0.947) are withdrawn.**
+> An audit of the evaluation found two bugs:
+>
+> 1. **Train/test leakage.** Rows were split randomly *after* augmentation, so each test
+>    transaction's synthetic copies — and every merchant — were also in training. All 64
+>    test merchants appeared in train, and 560 of 567 test rows matched a training
+>    transaction (same amount and label). The 0.947 measured memorization, not
+>    generalization to new merchants.
+> 2. **Label leakage in the Groq baseline.** The whole test row, including the gold
+>    `output` column, was serialized into the prompt.
+>
+> Both are fixed: `build_dataset.py` now holds out whole merchants (0 merchants shared
+> between splits), and `baseline_eval.py` sends only description / merchant / amount,
+> with PII masked, exactly like production.
 
 | Approach | Accuracy | Macro F1 | Latency | Cost per 1k txns |
 |---|---|---|---|---|
-| Rules only | **0.739** | **0.708** | instant | $0 |
-| Rules + Groq (Llama 3.1 8B) | 0.778 | 0.735 | 656 ms/txn | $0.0016 |
-| Fine-tuned Qwen2.5-1.5B + LoRA (local) | **0.947** | **0.928** | ~45 ms (GPU) / ~3s (CPU) | ~$0 |
+| Rules only (current production rules) | **0.799** | **0.751** | instant | $0 |
+| Rules + Groq | re-run pending | | | |
+| Fine-tuned Qwen2.5-1.5B + LoRA (local) | re-train pending | | 3.2 s/txn measured on CPU | ~$0 |
 
-Measured on the same 567-transaction held-out test set. Numbers update automatically via
-`eval/eval_finetuned.py`, which reads `eval/results/baseline_*.json`.
+Measured on the merchant-held-out test set: 776 rows from 10 merchants the models never
+see in training (one per category). That is a small number of merchants, so expect
+noticeable variance between seeds; report the mean over a few `--seed` values.
 
-Rules-only is cheap but blind: it has a **0 F1 on `Transfers`** (UPI-to-friend, credit-card
-payment, FD deposit are not in the rule table) and relies on a 0.19-precision `Other`
-bucket to absorb everything it doesn't recognize.
-
-The Groq pass rescues `Transfers` (F1 0 → 0.38) but **hurts** some categories it was
-supposed to keep: Food & Dining (0.91→0.90), Groceries (0.86→0.82), Transport (0.89→0.84)
-— the LLM overrides confident rule matches with wrong guesses. Net gain is only +0.04 acc /
-+0.03 F1, at ~656 ms/txn and API cost. That's the ceiling the fine-tuned model needs to
-beat.
+For reference, the current rules score 0.898 accuracy on the old (leaky) test set, up
+from 0.739, after switching to whole-word, longest-keyword-first matching with a
+description fallback.
 
 ## Stack
 
@@ -72,13 +82,17 @@ spend-classifier-qlora/
   `POS MERCHANT SWIGGY CARD NO 12...`. Each original row gets 3 synthetic variants in
   realistic statement formats (some with a blank `merchant` column, forcing the model to
   parse the description). Originals are flagged `is_synthetic: false`.
-- **Final size: 5,668 examples**, stratified 80/10/10 → 4,534 train / 567 val / 567 test.
+- **Final size: 5,668 examples**, split **by merchant**: for each category, one unseen
+  merchant goes to test and one to val; everything else is train → 4,012 train /
+  880 val / 776 test, with 0 merchants shared between splits. All augmented copies of a
+  transaction stay in the same split as the original.
 
 ### Build it
 
 ```bash
-python train/build_dataset.py              # writes data/*.jsonl
+python train/build_dataset.py              # writes data/*.jsonl (merchant split)
 python train/build_dataset.py --preview 30 # Phase 1 checkpoint: hand-check labels
+python train/build_dataset.py --split random  # legacy leaky split, only to reproduce old numbers
 ```
 
 ## Baseline (Phase 2)
@@ -93,8 +107,8 @@ python eval/baseline_eval.py --rules-only
 python eval/baseline_eval.py
 ```
 
-Measured rules-only baseline (567 txns): **accuracy 0.739, macro F1 0.708** —
-`Transfers` F1 = 0.00, `Other` precision = 0.19. Results saved to `eval/results/`.
+Measured rules-only baseline on the merchant-held-out test set (776 txns):
+**accuracy 0.799, macro F1 0.751**. Results saved to `eval/results/`.
 
 > **Free-tier discovery:** Groq's free tier caps ~6000 TPM. Production batch size (150
 > txns ≈ 12.6k tokens) gets rejected with HTTP 413. `baseline_eval.py` auto-sizes batches
@@ -145,8 +159,9 @@ descriptions with blank merchant).
 ## Integration (Phase 6)
 
 `inference/classifier.py` exposes `LocalTransactionClassifier.categorize_batch(df, ...)`
-with the same signature and return contract as the bot's `categorize_batch`. Flip the
-whole app with one env var via `inference/integrate.py`:
+with the same signature and return contract as the bot's `categorize_batch`. After the
+one-line swap in `app.py` shown below (not applied in the deployed app, which uses Groq),
+the mode is chosen with one env var via `inference/integrate.py`:
 
 ```
 CATEGORIZER_MODE=groq    # current behavior (rules + Groq API)
