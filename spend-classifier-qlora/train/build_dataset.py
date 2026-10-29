@@ -19,11 +19,10 @@ Usage:
 import argparse
 import json
 import random
+from collections import Counter
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 CATEGORIES = [
     "Food & Dining", "Groceries", "Transport", "Shopping", "Subscriptions",
@@ -90,6 +89,9 @@ def _to_example(row, rng):
         "description": description,
         "amount": float(row["Amount"]),
         "merchant": merchant,
+        # Original merchant, kept even when the augmented variant blanks `merchant`;
+        # used to keep every transaction of a merchant in a single split.
+        "source_merchant": str(row["Merchant"]).strip(),
         "is_synthetic": bool(row.get("is_synthetic", False)),
     }
 
@@ -126,6 +128,61 @@ def load_source(input_path, augment):
     return examples
 
 
+def _group(ex):
+    return ex["source_merchant"].lower()
+
+
+def merchant_split(examples, seed, held_out_frac=0.2):
+    """Split so that no merchant appears in more than one of train/val/test.
+
+    A random row split leaks: the 3 augmented copies of each transaction, and
+    every other transaction from the same merchant, land on both sides, so the
+    test set measures memorization. Holding out whole merchants measures how
+    well the model handles merchants it has never seen.
+
+    Merchants are held out per category (by their majority label) so every
+    category with 2+ merchants gets at least one unseen merchant in test, and
+    one in val when it has 3+.
+    """
+    rng = random.Random(seed)
+    labels_by_merchant = {}
+    for ex in examples:
+        labels_by_merchant.setdefault(_group(ex), Counter())[ex["output"]] += 1
+    merchants_by_category = {}
+    for merchant, counts in sorted(labels_by_merchant.items()):
+        merchants_by_category.setdefault(counts.most_common(1)[0][0], []).append(merchant)
+
+    val_merchants, test_merchants = set(), set()
+    for category in sorted(merchants_by_category):
+        merchants = merchants_by_category[category]
+        rng.shuffle(merchants)
+        if len(merchants) < 2:
+            continue
+        n_held = max(2 if len(merchants) >= 3 else 1, round(len(merchants) * held_out_frac))
+        for i, merchant in enumerate(merchants[:n_held]):
+            (test_merchants if i % 2 == 0 else val_merchants).add(merchant)
+
+    train = [ex for ex in examples if _group(ex) not in val_merchants | test_merchants]
+    val = [ex for ex in examples if _group(ex) in val_merchants]
+    test = [ex for ex in examples if _group(ex) in test_merchants]
+    return train, val, test
+
+
+def random_split(examples, seed):
+    """Legacy row-level split (leaky — kept only to reproduce old numbers)."""
+    from sklearn.model_selection import train_test_split
+
+    cats = [ex["output"] for ex in examples]
+    train, rest = train_test_split(examples, test_size=0.2, stratify=cats, random_state=seed)
+    cats_rest = [ex["output"] for ex in rest]
+    val, test = train_test_split(rest, test_size=0.5, stratify=cats_rest, random_state=seed)
+    return train, val, test
+
+
+def merchant_overlap(a, b):
+    return len({_group(ex) for ex in a} & {_group(ex) for ex in b})
+
+
 def main():
     global args
     parser = argparse.ArgumentParser(description=__doc__)
@@ -134,6 +191,8 @@ def main():
     parser.add_argument("--no-augment", action="store_true", help="originals only")
     parser.add_argument("--preview", type=int, default=0, help="print N random samples and exit")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--split", choices=["merchant", "random"], default="merchant",
+                        help="merchant: hold out whole merchants (default). random: legacy leaky row split")
     args = parser.parse_args()
 
     examples = load_source(args.input, augment=not args.no_augment)
@@ -145,10 +204,10 @@ def main():
         print(f"\nTotal examples: {len(examples)}")
         return
 
-    cats = [ex["output"] for ex in examples]
-    train, rest = train_test_split(examples, test_size=0.2, stratify=cats, random_state=args.seed)
-    cats_rest = [ex["output"] for ex in rest]
-    val, test = train_test_split(rest, test_size=0.5, stratify=cats_rest, random_state=args.seed)
+    if args.split == "merchant":
+        train, val, test = merchant_split(examples, args.seed)
+    else:
+        train, val, test = random_split(examples, args.seed)
 
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -165,7 +224,13 @@ def main():
     print(f"Split sizes -> train: {len(train)}, val: {len(val)}, test: {len(test)}")
     print(f"\nTrain label distribution:\n{counts(train)}")
     print(f"\nTest label distribution:\n{counts(test)}")
-    print("\nWrote: data/train.jsonl, data/val.jsonl, data/test.jsonl")
+    print(f"\nSplit: {args.split}")
+    print(f"Merchants shared train/test: {merchant_overlap(train, test)}, "
+          f"train/val: {merchant_overlap(train, val)}  (should be 0 for a leak-free split)")
+    missing = sorted(set(CATEGORIES) - {ex["output"] for ex in test})
+    if missing:
+        print(f"WARNING: categories with no held-out merchant in test: {missing}")
+    print(f"\nWrote: {out / 'train.jsonl'}, {out / 'val.jsonl'}, {out / 'test.jsonl'}")
     print("\nNEXT (Phase 1 checkpoint): manually review 20-30 samples:")
     print("    python train/build_dataset.py --preview 30")
 
