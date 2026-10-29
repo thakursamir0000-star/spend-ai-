@@ -19,8 +19,8 @@ import pandas as pd
 import torch
 import yaml
 from datasets import Dataset
-from peft import LoraConfig, get_peft_model
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainerCallback, TrainingArguments
 from trl import SFTTrainer
 
 CATEGORIES = [
@@ -33,6 +33,14 @@ SYSTEM_PROMPT = (
     "Categorize each transaction into exactly one of these categories: {cats}. "
     "Respond with only the category name."
 )
+
+
+class StopIfNoGradient(TrainerCallback):
+    """Stop at the first log if no gradient reached the adapter (it would train nothing)."""
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        if logs and logs.get("grad_norm") == 0.0:
+            raise RuntimeError(f"grad_norm is 0 at step {state.global_step}: the LoRA weights are not being trained.")
 
 
 def load_jsonl(path):
@@ -93,6 +101,11 @@ def main():
             attn_implementation="sdpa",
         )
     model = AutoModelForCausalLM.from_pretrained(cfg["base_model"], **model_kwargs)
+    if has_cuda and not args.smoke:
+        # Standard QLoRA prep: fp32 norms, input gradients and non-reentrant checkpointing,
+        # so gradients reach the LoRA weights through the frozen 4-bit layers.
+        model = prepare_model_for_kbit_training(
+            model, use_gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False})
     model = get_peft_model(model, LoraConfig(
         r=lora_cfg["r"],
         lora_alpha=lora_cfg["alpha"],
@@ -126,6 +139,7 @@ def main():
         load_best_model_at_end=arg("load_best_model_at_end", True),
         metric_for_best_model="eval_loss",
         gradient_checkpointing=False if args.smoke else arg("gradient_checkpointing", True),
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         bf16=(has_cuda and not args.smoke) and arg("bf16", True),
         fp16=False,
         output_dir=cfg["output_dir"],
@@ -141,6 +155,7 @@ def main():
         dataset_text_field="text",
         max_seq_length=arg("max_seq_length", 512),
         packing=arg("packing", False),
+        callbacks=[StopIfNoGradient()],
         args=TrainingArguments(**common),
     )
 

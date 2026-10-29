@@ -156,6 +156,15 @@ Pipeline check: run `python train/train_qlora.py --config train/config.yaml --sm
 first to confirm the end-to-end path before the real run. **Checkpoint:** watch `eval_loss`
 decrease; if it's flat, the data formatting is broken — don't start a long run.
 
+**A failed run (October 2026).** The first retrain on the merchant split ran all 4 epochs
+with `grad_norm` 0.0 at every step: train loss stayed at ~3.28, `eval_loss` was 3.3516 at
+all 20 evaluations, and every LoRA B matrix in the saved adapter was still zero — so the
+"fine-tuned" model was exactly the base model. That run had installed PEFT 0.21.2; the
+working adapter was trained with 0.20.0. The smoke test couldn't catch it because it turns
+gradient checkpointing off. The notebook and `train_qlora.py` now pin `peft==0.20.0`, run
+the standard `prepare_model_for_kbit_training` step with non-reentrant gradient
+checkpointing, and **stop at the first log (step 10) if `grad_norm` is 0**.
+
 The loss log of the first run wasn't kept (only the adapter was downloaded). The notebook
 and `train_qlora.py` now save `trainer_state.json` next to the adapter, so the next run's
 train / eval loss curve can be plotted from its `log_history`.
