@@ -1,3 +1,14 @@
+---
+title: AI Spend Insights Bot
+emoji: 💰
+colorFrom: green
+colorTo: blue
+sdk: docker
+app_port: 8501
+pinned: false
+short_description: Spend insights from bank/UPI CSVs with LLMs
+---
+
 # AI Spend Insights Bot
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20App-brightgreen)](https://4svb3d4a3caa4seimrygxv.streamlit.app/)
@@ -48,15 +59,18 @@ Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm`
 
 | Evaluation | Rows | Rules only | Rules + LLM | Macro F1 (rules → + LLM) |
 |---|---|---|---|---|
-| Categorization — sample data, labels hidden | 1,417 (213 sent to LLM) | 0.905 | **0.972** | 0.841 → 0.968 |
-| Categorization — bank-style descriptions, merchants unseen in training* | 776 (236 sent to LLM) | 0.799 | **0.890** | 0.751 → 0.872 |
-| NL Q&A — computed number matches pandas ground truth | 14 questions | – | **14 / 14** | median 5.2 s per answer |
+| Categorization — sample data, labels hidden | 1,417 (213 sent to LLM) | 0.905 | **0.974** | 0.841 → 0.970 |
+| Categorization — bank-style descriptions, merchants unseen in training* | 776 (236 sent to LLM) | 0.799 | **0.885** | 0.751 → 0.877 |
+| NL Q&A — computed number matches pandas ground truth | 14 questions | – | **13 / 14** | median 8.0 s per answer |
 
 \* the held-out test set produced by `spend-classifier-qlora/train/build_dataset.py`; pass it with `--test-jsonl`.
 
-Notes on the LLM run (Groq free tier, `openai/gpt-oss-20b`):
-- It ran before the batch-size and failover fix (batches of 150). Two requests failed — one JSON validation error, one rate limit — and were answered by `openai/gpt-oss-120b`.
-- Q&A first scored 13/14, but the miss was a bug in the evaluation itself: its ground truth for "last month" assumed the data ended in May, while it ends on 30 June. The model's answer (May) was right; with the ground truth fixed and covered by a test, the saved answers score 14/14.
+Notes on the LLM run (29 Oct 2026, current code, Groq free tier, `openai/gpt-oss-20b`):
+- Three batches hit the free tier's 8,000 tokens-per-minute limit and were answered by the fallback `openai/gpt-oss-120b`; every row still got an LLM label.
+- **The Q&A miss is a model parsing error:** for *"Break down my Shopping spend by month"* the model returned a query with no category filter, so pandas summed all spending per month — and the phrased answer still called it "shopping". The **How this was computed** panel shows the empty filter list, which is how a user can catch it. A second run straight after answered it correctly (14/14): with temperature 0.1 answers vary between runs, and with 14 questions one answer moves the score by 7 points.
+- **That second run's categorization numbers aren't reported:** `gpt-oss-20b` hit its daily token cap mid-run and the old Llama fallbacks returned 404 (Groq no longer offers them), so 83 of the 236 unseen-merchant rows got no LLM label and fell back to `Other`. That run is why the fallback chain was fixed (see [Rate limits](#models--llm-strategy)).
+- **Fallback check after the fix:** a third run started with both gpt-oss models at their daily caps. Each was detected and skipped, `qwen/qwen3.8-27b` took over, and Q&A scored 14/14. On the unseen-merchant set, though, qwen's free-tier limit of 1,000 output tokens per minute let only 110 of 236 rows through the parallel batches; the other 126 fell back to `Other` (accuracy 0.822). So once both gpt-oss daily caps are spent the app keeps answering, but a large statement is only partly labelled.
+- An earlier run found a bug in the evaluation itself: the ground truth for "last month" assumed the data ended in May, while it ends on 30 June. It is fixed and covered by a test.
 - 14 questions is a small set; it checks the parse → pandas → phrase path, not every phrasing a user might try.
 
 ## Models & LLM Strategy
@@ -67,12 +81,13 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 |---|---|---|
 | 1 (Primary) | `openai/gpt-oss-20b` | Categorization, Q&A parsing, anomaly phrasing |
 | 2 (Fallback) | `openai/gpt-oss-120b` | Larger reasoning model |
-| 3 (Fallback) | `llama-3.3-70b-versatile` | Non-reasoning fallback |
-| 4 (Fallback) | `llama-3.1-8b-instant` | Fast last resort |
+| 3 (Fallback) | `qwen/qwen3.8-27b` | Different model family with its own rate limits; strict JSON, no reasoning text |
 
 > **Override:** `GROQ_CATEGORIZER_MODEL` and `GROQ_QA_MODEL` set the primary model per task; `GROQ_FALLBACK_MODELS` (comma-separated) replaces the fallback list. Every failure is logged, and a model the API reports as missing (404) is skipped for the rest of the session, so a retired model ID costs one request instead of one per batch. gpt-oss models run with `reasoning_effort="low"` so the JSON answer isn't cut off, and transactions are sent in batches of 40.
 >
-> **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run.
+> **Rate limits:** the Groq SDK already waits out a short 429 (it follows the server's `retry-after` up to 60 s, twice). A longer `retry-after` means a per-day token cap — on the free tier that is reached after a few full evaluation runs — so that model is skipped until the cap resets instead of being retried on every batch, and the next model in the chain takes over. Rows that no model labels fall back to `Other` and are counted in the sidebar.
+>
+> **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run. It happened again in October 2026, when Groq stopped offering `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`: the logs showed the 404s on the next evaluation run, and the chain now ends with `qwen/qwen3.8-27b`.
 
 ### QLoRA Fine-Tuned Model *(optional)*
 
@@ -83,7 +98,7 @@ The `spend-classifier-qlora/` sub-project fine-tunes **Qwen2.5-1.5B-Instruct** w
 | Test set | Rules only | Rules + Groq LLM | Fine-tuned (local) |
 |---|---|---|---|
 | Known merchants, new statement formats (567 rows) | 0.898 | – | **0.947** (macro F1 0.928) |
-| Unseen merchants (776 rows) | 0.799 | **0.890** | not measured* |
+| Unseen merchants (776 rows) | 0.799 | **0.885** | not measured* |
 
 \* The adapter was trained on the original random split, which includes the unseen-merchant test merchants, so scoring it there wouldn't be fair; `build_dataset.py` now produces a merchant-held-out split for the next training run. An evaluation audit also found that the original Groq baseline was sent the gold labels; that number is withdrawn. Details in [`spend-classifier-qlora/README.md`](spend-classifier-qlora/README.md).
 
@@ -103,6 +118,13 @@ streamlit run app.py
 Without an API key the app still runs: categorization uses rules only and Q&A is disabled.
 
 Optional settings: `MASK_PII=false` turns off masking (debugging only); `GROQ_*_MODEL` as above.
+
+Or with Docker (the same image the Hugging Face Space builds):
+
+```bash
+docker build -t spend-ai .
+docker run -p 8501:8501 -e GROQ_API_KEY=gsk_... spend-ai
+```
 
 ## Testing
 
@@ -154,6 +176,7 @@ python generate_sample_data.py
 ├── generate_sample_data.py     # Synthetic transaction generator
 ├── sample_transactions.csv     # Pre-generated sample data (1,417 transactions)
 ├── requirements.txt / requirements-dev.txt
+├── Dockerfile                  # Hugging Face Space / local container
 └── spend-classifier-qlora/     # QLoRA fine-tuning sub-project
     ├── train/                  # Dataset builder (merchant split), config, training + Colab notebook
     ├── eval/                   # Baseline & fine-tuned model evaluation

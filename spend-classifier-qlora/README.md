@@ -28,10 +28,12 @@ it handles merchants it has never seen.
 | Approach | Accuracy | Macro F1 |
 |---|---|---|
 | Rules only | 0.799 | 0.751 |
-| Rules + Groq LLM (`openai/gpt-oss-20b`) | **0.890** | **0.872** |
+| Rules + Groq LLM (`openai/gpt-oss-20b`) | **0.885** | **0.877** |
 
-Measured on the merchant-held-out test set: 776 rows from 10 merchants that never appear
-in training (one per category; small, so expect some variance between seeds). The
+Measured from the repo root with
+`python evaluate.py --with-llm --test-jsonl spend-classifier-qlora/data/test.jsonl` on the
+merchant-held-out test set: 776 rows from 10 merchants that never appear in training (one
+per category; small, so expect some variance between seeds and runs). The
 fine-tuned adapter isn't scored here: it was trained on the original split, which
 contains these merchants, so a fair unseen-merchant number needs a run on
 `--split merchant` (see [limitations](#honest-limitations)).
@@ -86,7 +88,7 @@ spend-classifier-qlora/
 
 ## Dataset
 
-- **Source:** `sample_transactions.csv` from the Spend Insights Bot — 1,418 transactions
+- **Source:** `sample_transactions.csv` from the Spend Insights Bot — 1,417 transactions
   generated across 6 months with merchant, amount, description and a gold `Category`
   (10 categories: Food & Dining, Groceries, Transport, Shopping, Subscriptions,
   Bills & Utilities, Entertainment, Healthcare, Transfers, Other).
@@ -123,10 +125,10 @@ python eval/baseline_eval.py
 Measured rules-only baseline on the merchant-held-out test set (776 txns):
 **accuracy 0.799, macro F1 0.751**. Results saved to `eval/results/`.
 
-> **Free-tier discovery:** Groq's free tier caps ~6000 TPM. Production batch size (150
-> txns ≈ 12.6k tokens) gets rejected with HTTP 413. `baseline_eval.py` auto-sizes batches
-> to stay under the token budget and retries with backoff — this is why latency is
-> ~656 ms/txn on the free tier.
+> **Free-tier discovery:** Groq's free tier caps ~6000 TPM. The bot's original batch size
+> (150 txns ≈ 12.6k tokens) was rejected with HTTP 413, so the bot now sends batches of 40.
+> `baseline_eval.py` auto-sizes batches to stay under the token budget and retries with
+> backoff — this is why latency is ~656 ms/txn on the free tier.
 
 ## Fine-tuning (Phases 3-4)
 
@@ -154,8 +156,9 @@ Pipeline check: run `python train/train_qlora.py --config train/config.yaml --sm
 first to confirm the end-to-end path before the real run. **Checkpoint:** watch `eval_loss`
 decrease; if it's flat, the data formatting is broken — don't start a long run.
 
-Training log is available via the Colab output (also `outputs/` checkpoints if you run
-locally with `train_qlora.py`). Paste the loss curve into the README later.
+The loss log of the first run wasn't kept (only the adapter was downloaded). The notebook
+and `train_qlora.py` now save `trainer_state.json` next to the adapter, so the next run's
+train / eval loss curve can be plotted from its `log_history`.
 
 ## Evaluation vs baseline (Phase 5)
 
@@ -194,8 +197,8 @@ df = categorize_batch_compat(df, client, progress_callback=on_progress)
   was trained before the merchant split existed. Rebuild the data with
   `python train/build_dataset.py` (merchant split is the default), retrain in Colab and
   run `eval/eval_finetuned.py` to get it; the rules + LLM result to compare against is
-  0.890.
-- **Small, synthetic-ish dataset.** The 1,418 "real" labels come from the bot's sample
+  0.885.
+- **Small, synthetic-ish dataset.** The 1,417 "real" labels come from the bot's sample
   generator (ground-truth = the generator's merchant→category mapping), not from a
   human-labeled bank export. Real-world generalization to genuinely novel merchants is
   unproven. Fix: label 500+ real transactions and retrain.

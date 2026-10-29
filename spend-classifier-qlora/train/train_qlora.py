@@ -147,6 +147,7 @@ def main():
     trainer.train()
     trainer.save_model(cfg["output_dir"])
     tokenizer.save_pretrained(cfg["output_dir"])
+    trainer.state.save_to_json(str(Path(cfg["output_dir"]) / "trainer_state.json"))  # train/eval loss history
 
     metrics = trainer.evaluate()
     print(f"\nFinal eval_loss: {metrics}")
