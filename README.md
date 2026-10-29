@@ -13,7 +13,7 @@ A personal finance assistant that analyzes bank/UPI transaction data using LLMs.
 - **Anomaly detection** — category spend spikes (>50% and ≥₹500 above the 3-month average) and new recurring merchants, measured from the latest date in your data.
 - **Interactive dashboard** — spend / income / net metrics, category pie, monthly trend, category breakdown over time, top merchants.
 - **NL Q&A with receipts** — ask *"How much did I spend on food last quarter?"*; the answer comes with a "How this was computed" panel showing the exact filters and result.
-- **QLoRA fine-tuning** *(optional sub-project)* — a local Qwen2.5-1.5B classifier for offline categorization; see [evaluation status](#qlora-fine-tuned-model-optional).
+- **QLoRA fine-tuning** *(optional sub-project)* — a trained local Qwen2.5-1.5B + LoRA classifier for offline categorization: 0.947 accuracy on known merchants in messy statement formats (rules: 0.898). See [results](#qlora-fine-tuned-model-optional).
 
 ## Architecture
 
@@ -78,7 +78,14 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 
 The `spend-classifier-qlora/` sub-project fine-tunes **Qwen2.5-1.5B-Instruct** with 4-bit QLoRA for transaction categorization.
 
-**Status: being re-evaluated.** An audit found that the earlier 94.7% accuracy came from a leaky split (every test merchant, and copies of 560 of 567 test transactions, were also in training) and that the LLM baseline was sent the gold labels. Both bugs are fixed — the dataset is now split by merchant — and the model needs to be retrained on the new split. Current honest baseline to beat: **rules 0.799 accuracy on unseen merchants**. Details in [`spend-classifier-qlora/README.md`](spend-classifier-qlora/README.md).
+**Training: complete** (rank-16 LoRA, 4 epochs, 4-bit QLoRA).
+
+| Test set | Rules only | Rules + Groq LLM | Fine-tuned (local) |
+|---|---|---|---|
+| Known merchants, new statement formats (567 rows) | 0.898 | – | **0.947** (macro F1 0.928) |
+| Unseen merchants (776 rows) | 0.799 | **0.890** | not measured* |
+
+\* The adapter was trained on the original random split, which includes the unseen-merchant test merchants, so scoring it there wouldn't be fair; `build_dataset.py` now produces a merchant-held-out split for the next training run. An evaluation audit also found that the original Groq baseline was sent the gold labels; that number is withdrawn. Details in [`spend-classifier-qlora/README.md`](spend-classifier-qlora/README.md).
 
 The deployed app uses the Groq path; switching to the local model requires the one-line swap described in the sub-project README.
 
