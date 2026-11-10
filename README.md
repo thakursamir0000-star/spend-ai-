@@ -9,7 +9,7 @@ A personal finance assistant that analyzes bank/UPI transaction data using LLMs.
 
 - **Bank-statement aware CSV parsing** — auto-detects date / amount / description / merchant columns, signed amounts (`Cr`/`Dr`, `+`/`-`, brackets), separate *Withdrawal* / *Deposit* columns and DR/CR type columns. Salary and refunds are tracked as income, not spending.
 - **Hybrid categorization** — valid labels from the file → whole-word keyword rules → per-transaction cache → batched, de-duplicated LLM calls. Every row records where its label came from.
-- **Privacy by default** — UPI IDs, phone numbers, emails and card/account/reference numbers are masked before text is sent to the LLM.
+- **Privacy by default** — UPI IDs, phone numbers, emails and card/account/reference numbers are masked before text is sent to the LLM, including the user's own questions. In Q&A they become numbered placeholders (`<UPI_ID_1>`, `<UPI_ID_2>`) that stay distinct and are mapped back locally, so filtering and the final answer still use the real values.
 - **Anomaly detection** — category spend spikes (>50% and ≥₹500 above the 3-month average) and new recurring merchants, measured from the latest date in your data.
 - **Interactive dashboard** — spend / income / net metrics, category pie, monthly trend, category breakdown over time, top merchants.
 - **NL Q&A with receipts** — ask *"How much did I spend on food last quarter?"*; the answer comes with a "How this was computed" panel showing the exact filters and result.
@@ -125,7 +125,7 @@ ruff check .
 pytest
 ```
 
-The tests use a fake LLM client, so they need no network or API key. They cover amount/direction parsing, bank column formats, rule matching, cache behavior, LLM failover, PII masking, Q&A filters and anomaly detection. CI runs lint, tests and the offline evaluation on Python 3.11 (pandas 2) and 3.12 (pandas 3) for every push and pull request.
+The tests use a fake LLM client, so they need no network or API key. They cover amount/direction parsing, bank column formats, rule matching, cache behavior, LLM failover, PII masking (including questions), date formats (ISO, day-first, month-first, mixed, unreadable rows), calendar quarters, Q&A filters and anomaly detection. CI runs lint, tests and the offline evaluation on Python 3.11 (pandas 2) and 3.12 (pandas 3) for every push and pull request.
 
 ## Usage
 

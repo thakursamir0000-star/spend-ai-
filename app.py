@@ -88,6 +88,14 @@ with st.sidebar:
             df = None
 
         if df is not None:
+            rejected = df.attrs.get("rejected", {})
+            skipped = sorted(set(rejected.get("unreadable_date", []) + rejected.get("missing_amount", [])))
+            if skipped:
+                st.warning(f"{len(skipped)} row(s) couldn't be read (unrecognised date or missing amount) "
+                           "and are left out of every total.")
+                with st.expander("Show the rows that were left out"):
+                    st.dataframe(raw_df.iloc[skipped])
+
             progress_bar = st.progress(0, text="Categorizing transactions…")
 
             def on_progress(current, total):

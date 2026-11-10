@@ -4,6 +4,8 @@ Output columns: date, amount (always positive), direction ("debit" = money out,
 "credit" = money in), description, merchant, original_category, source_row,
 category, month.
 """
+import re
+
 import pandas as pd
 
 DEBIT, CREDIT = "debit", "credit"
@@ -106,12 +108,38 @@ def _find_amount_column(df, exclude):
     return None
 
 
-def _parse_date(df, col):
+_YEAR_FIRST = re.compile(r"^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}")
+_NUMERIC_DATE = re.compile(r"^(\d{1,2})[-/.](\d{1,2})[-/.]\d{2,4}")
+
+
+def date_order(values):
+    """'dmy' or 'mdy' for a column's numeric, non-ISO dates.
+
+    A first part above 12 can only be a day and a second part above 12 only a
+    day too, so one such date settles the file's convention. When nothing
+    settles it, day-first is assumed (Indian bank exports).
+    """
+    day_first_seen = month_first_seen = False
+    for value in values:
+        match = _NUMERIC_DATE.match(value)
+        if match:
+            day_first_seen |= int(match.group(1)) > 12
+            month_first_seen |= int(match.group(2)) > 12
+    return "mdy" if month_first_seen and not day_first_seen else "dmy"
+
+
+def _parse_date(df, col, order="auto"):
+    """Parse dates row by row: year-first values (2026-01-13) as ISO, the rest
+    with the file's day/month order. Unreadable values become NaT."""
     raw = df[col].astype(str).str.strip()
-    parsed = pd.to_datetime(raw, dayfirst=True, errors='coerce')
-    if parsed.isna().all():
-        parsed = pd.to_datetime(raw, errors='coerce')
-    return parsed
+    year_first = raw.str.match(_YEAR_FIRST)
+    dayfirst = (date_order(raw[~year_first]) if order == "auto" else order) == "dmy"
+    parts = []
+    if year_first.any():
+        parts.append(pd.to_datetime(raw[year_first], format="mixed", yearfirst=True, dayfirst=False, errors="coerce"))
+    if (~year_first).any():
+        parts.append(pd.to_datetime(raw[~year_first], format="mixed", dayfirst=dayfirst, errors="coerce"))
+    return pd.concat(parts).reindex(raw.index)
 
 
 def clean_dataframe(df):
@@ -169,11 +197,18 @@ def clean_dataframe(df):
         out['original_category'] = ''
 
     out['source_row'] = range(len(df))  # position in the uploaded file, for tracing results back
+    rejected = {
+        "unreadable_date": out.loc[out['date'].isna(), 'source_row'].tolist(),
+        "missing_amount": out.loc[out['date'].notna() & out['amount'].isna(), 'source_row'].tolist(),
+    }
     out = out.dropna(subset=['date', 'amount'])
     out = out[out['amount'] > 0]
     out = out.sort_values('date', kind='stable').reset_index(drop=True)
     out['category'] = ''
     out['month'] = out['date'].dt.to_period('M').astype(str)
+    # Rows left out, by position in the uploaded file, so the app can show them
+    # instead of silently changing the totals.
+    out.attrs['rejected'] = rejected
     return out
 
 
