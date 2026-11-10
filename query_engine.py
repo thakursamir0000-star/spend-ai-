@@ -11,7 +11,7 @@ import pandas as pd
 
 from data_cleaner import DEBIT
 from llm_client import chat, chat_json
-from privacy import mask_pii
+from privacy import Pseudonymizer
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +49,10 @@ Respond with ONLY a JSON object with these keys:
 - "group_by": optional field name to group results by: "month", "category" or "merchant"
 - "question_type": "aggregation" | "list" | "comparison"
 
-Use ISO date format. For "last month", "last quarter", "this month" etc., compute the actual dates.
+Use ISO date format. For "last month", "this month" etc., compute the actual dates.
 Treat {today} (the latest transaction in the data) as today.
+"Last quarter" means the previous calendar quarter, {last_quarter_start} to {last_quarter_end};
+"this quarter" starts on {quarter_start}; "last 3 months" starts on {three_months_start}.
 
 Examples:
 "how much did I spend on food last month?"
@@ -63,7 +65,10 @@ Examples:
 → {{"filters": [{{"field": "category", "operator": "eq", "value": "Subscriptions"}}, {{"field": "start_date", "operator": "gte", "value": "{year_start}"}}], "aggregation": "none", "group_by": null, "question_type": "list"}}
 
 "how much did I spend per category last quarter?"
-→ {{"filters": [{{"field": "start_date", "operator": "gte", "value": "{quarter_start}"}}], "aggregation": "sum", "group_by": "category", "question_type": "aggregation"}}
+→ {{"filters": [{{"field": "start_date", "operator": "gte", "value": "{last_quarter_start}"}}, {{"field": "end_date", "operator": "lte", "value": "{last_quarter_end}"}}], "aggregation": "sum", "group_by": "category", "question_type": "aggregation"}}
+
+"what did I spend in the last 3 months?"
+→ {{"filters": [{{"field": "start_date", "operator": "gte", "value": "{three_months_start}"}}], "aggregation": "sum", "group_by": null, "question_type": "aggregation"}}
 
 "how much income did I receive?"
 → {{"filters": [{{"field": "direction", "operator": "eq", "value": "credit"}}], "aggregation": "sum", "group_by": null, "question_type": "aggregation"}}
@@ -88,24 +93,42 @@ def reference_date(df):
     return pd.Timestamp.now().normalize()
 
 
+def calendar_dates(today):
+    """Date boundaries for relative phrases, computed here rather than by the LLM."""
+    this_quarter = today.to_period("Q")
+    last_quarter = this_quarter - 1
+    return {
+        "today": today.strftime("%Y-%m-%d"),
+        "this_month": today.strftime("%Y-%m"),
+        "last_month": (today.replace(day=1) - pd.DateOffset(months=1)).strftime("%Y-%m"),
+        "quarter_start": this_quarter.start_time.strftime("%Y-%m-%d"),
+        "last_quarter_start": last_quarter.start_time.strftime("%Y-%m-%d"),
+        "last_quarter_end": last_quarter.end_time.strftime("%Y-%m-%d"),
+        "three_months_start": (today - pd.DateOffset(months=3)).strftime("%Y-%m-%d"),
+        "year_start": today.replace(month=1, day=1).strftime("%Y-%m-%d"),
+    }
+
+
 def _build_prompt(question, df):
-    today = reference_date(df)
-    return SYSTEM_PROMPT.format(
-        question=question,
-        today=today.strftime("%Y-%m-%d"),
-        this_month=today.strftime("%Y-%m"),
-        last_month=(today.replace(day=1) - pd.DateOffset(months=1)).strftime("%Y-%m"),
-        quarter_start=(today - pd.DateOffset(months=3)).strftime("%Y-%m-%d"),
-        year_start=today.replace(month=1, day=1).strftime("%Y-%m-%d"),
-    )
+    return SYSTEM_PROMPT.format(question=question, **calendar_dates(reference_date(df)))
 
 
-def _parse_question(question, df, client):
+def _unmask_value(value, pseudo):
+    if isinstance(value, list):
+        return [pseudo.unmask(v) for v in value]
+    return pseudo.unmask(value)
+
+
+def _parse_question(question, df, client, pseudo):
+    """`question` is already pseudonymized; filter values are restored locally."""
     parsed = chat_json(client, _build_prompt(question, df), primary_env="GROQ_QA_MODEL", temperature=0.1)
     if not isinstance(parsed, dict):
         return None
     if not isinstance(parsed.get("filters", []), list):
         parsed["filters"] = []
+    for f in parsed["filters"]:
+        if isinstance(f, dict) and "value" in f:
+            f["value"] = _unmask_value(f["value"], pseudo)
     return parsed
 
 
@@ -153,7 +176,10 @@ def _apply_filter(df, field, op, value):
     return df[_text_mask(df[field], op, value)], True
 
 
-def _execute_query(df, query):
+def _execute_query(df, query, pseudo=None):
+    """Run `query` on `df`. Merchant names in the result are pseudonymized with
+    `pseudo` (numbered placeholders), since the result is sent to the LLM."""
+    pseudo = pseudo or Pseudonymizer()
     filters = [f for f in query.get("filters", []) if isinstance(f, dict) and f.get("value") is not None]
     filtered = df
     if "direction" in df.columns and not any(f.get("field") == "direction" for f in filters):
@@ -181,7 +207,7 @@ def _execute_query(df, query):
             "rows": [
                 {
                     "date": r.date.strftime("%Y-%m-%d"),
-                    "merchant": mask_pii(str(r.merchant)),
+                    "merchant": pseudo.mask(str(r.merchant)),
                     "amount": round(float(r.amount), 2),
                     "category": r.category,
                 }
@@ -195,7 +221,8 @@ def _execute_query(df, query):
         grouped = filtered.groupby(group_by)["amount"].agg(func)
         grouped = grouped.sort_index() if group_by == "month" else grouped.sort_values(ascending=False)
         result = {
-            "grouped": {mask_pii(str(k)): round(float(v), 2) for k, v in grouped.head(MAX_GROUPS).items()},
+            # Numbered placeholders keep distinct merchants distinct as dict keys.
+            "grouped": {pseudo.mask(str(k)): round(float(v), 2) for k, v in grouped.head(MAX_GROUPS).items()},
             "aggregation": agg if agg in AGGREGATIONS else "sum",
             "group_by": group_by,
             "groups_total": int(len(grouped)),
@@ -208,12 +235,16 @@ def _execute_query(df, query):
             row = filtered.loc[filtered["amount"].idxmax() if agg == "max" else filtered["amount"].idxmin()]
             result["transaction"] = {
                 "date": row["date"].strftime("%Y-%m-%d"),
-                "merchant": mask_pii(str(row["merchant"])),
+                "merchant": pseudo.mask(str(row["merchant"])),
                 "category": row["category"],
             }
 
-    if ignored:
-        result["ignored_filters"] = ignored
+    if ignored:  # echoed to the LLM, so their values are masked too
+        result["ignored_filters"] = [
+            {**f, "value": [pseudo.mask(str(v)) for v in f["value"]] if isinstance(f["value"], list)
+             else pseudo.mask(str(f["value"]))}
+            for f in ignored
+        ]
     return result
 
 
@@ -244,17 +275,22 @@ def _fallback_answer(result):
 
 def answer_question(question, df, client, return_details=False):
     """Answer `question` from `df`. With return_details=True, also return the query and raw result."""
-    query = _parse_question(question, df, client)
+    # Identifiers in the question never reach the LLM: they become numbered
+    # placeholders, which are mapped back locally for filtering and the answer.
+    pseudo = Pseudonymizer()
+    masked_question = pseudo.mask(question)
+    query = _parse_question(masked_question, df, client, pseudo)
     if not query:
         answer = "Sorry, I couldn't understand that question. Try asking about spending by category, month, or merchant."
         return {"answer": answer, "query": None, "result": None} if return_details else answer
 
-    result = _execute_query(df, query)
+    result = _execute_query(df, query, pseudo)
     if result.get("empty"):
         answer = _fallback_answer(result)
     else:
-        prompt = PHRASE_PROMPT.format(question=question, result_str=json.dumps(result, indent=2, default=str))
+        prompt = PHRASE_PROMPT.format(question=masked_question, result_str=json.dumps(result, indent=2, default=str))
         answer = chat(client, prompt, primary_env="GROQ_QA_MODEL", temperature=0.3) or _fallback_answer(result)
+    answer = pseudo.unmask(answer)
 
     if return_details:
         return {"answer": answer, "query": query, "result": result}

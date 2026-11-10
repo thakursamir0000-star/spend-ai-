@@ -1,8 +1,9 @@
 import json
 
+import pandas as pd
 import pytest
 
-from query_engine import _execute_query, _fallback_answer, answer_question, reference_date
+from query_engine import _execute_query, _fallback_answer, answer_question, calendar_dates, reference_date
 from tests.conftest import prompt_of
 
 
@@ -115,3 +116,50 @@ def test_unparseable_question(txns, fake_client):
 ])
 def test_fallback_answers(result, expected):
     assert expected in _fallback_answer(result)
+
+
+# ── privacy, quarters and grouping (from an external review) ──────
+
+@pytest.fixture
+def upi_txns():
+    return pd.DataFrame({
+        "date": pd.to_datetime(["2026-01-05", "2026-01-06", "2026-01-07"]),
+        "merchant": ["alice@okaxis", "bob@okaxis", "Swiggy"],
+        "description": ["UPI", "UPI", "Food"],
+        "amount": [100.0, 200.0, 50.0],
+        "category": ["Transfers", "Transfers", "Food & Dining"],
+        "direction": ["debit", "debit", "debit"],
+        "month": ["2026-01", "2026-01", "2026-01"],
+    })
+
+
+def test_question_identifiers_never_reach_the_llm(upi_txns, fake_client):
+    def responder(kwargs):
+        if kwargs.get("response_format"):  # the parser echoes the placeholder it was given
+            return json.dumps(q([{"field": "merchant", "operator": "contains", "value": "<UPI_ID_1>"}]))
+        return "You paid <UPI_ID_1> ₹100."
+
+    client = fake_client(responder)
+    details = answer_question("How much did I pay alice@okaxis? My phone is 9876543210, mail a.b@example.com",
+                              upi_txns, client, return_details=True)
+    sent = " ".join(prompt_of(call) for call in client.calls)
+    assert "alice@okaxis" not in sent and "9876543210" not in sent and "a.b@example.com" not in sent
+    assert details["result"]["value"] == 100.0           # the filter was applied with the real value
+    assert details["answer"] == "You paid alice@okaxis ₹100."  # restored locally for the user
+
+
+def test_grouped_merchants_with_identifiers_stay_distinct(upi_txns):
+    result = _execute_query(upi_txns, q(group_by="merchant"))
+    assert sorted(result["grouped"].values()) == [50.0, 100.0, 200.0]
+    assert result["groups_total"] == 3 and "alice@okaxis" not in json.dumps(result)
+
+
+def test_last_quarter_is_the_previous_calendar_quarter():
+    dates = calendar_dates(pd.Timestamp("2026-06-30"))
+    assert (dates["last_quarter_start"], dates["last_quarter_end"]) == ("2026-01-01", "2026-03-31")
+    assert dates["quarter_start"] == "2026-04-01" and dates["three_months_start"] == "2026-03-30"
+
+
+def test_ignored_filter_values_are_masked_before_phrasing(upi_txns):
+    result = _execute_query(upi_txns, q([{"field": "city", "operator": "eq", "value": "near alice@okaxis"}]))
+    assert "alice@okaxis" not in json.dumps(result)

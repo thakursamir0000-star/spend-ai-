@@ -135,3 +135,14 @@ def test_mask_keeps_merchant_words():
 def test_masking_can_be_disabled(monkeypatch):
     monkeypatch.setenv("MASK_PII", "false")
     assert mask_pii("9876543210") == "9876543210"
+
+
+def test_pseudonymizer_keeps_distinct_values_distinct_and_restores_them():
+    from privacy import Pseudonymizer
+
+    pseudo = Pseudonymizer()
+    masked = pseudo.mask("paid alice@okaxis, then bob@okaxis, then alice@okaxis again")
+    assert masked == "paid <UPI_ID_1>, then <UPI_ID_2>, then <UPI_ID_1> again"
+    assert pseudo.mask("call 9876543210 or mail a.b@example.com") == "call <PHONE_1> or mail <EMAIL_1>"
+    assert pseudo.unmask("You paid <UPI_ID_2> and <UPI_ID_1>") == "You paid bob@okaxis and alice@okaxis"
+    assert pseudo.unmask("<UPI_ID_9> is unknown") == "<UPI_ID_9> is unknown"

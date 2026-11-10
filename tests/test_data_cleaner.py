@@ -93,3 +93,26 @@ def test_missing_columns_raise_value_error():
         clean_dataframe(pd.DataFrame({"Description": ["x"], "Amount": [1]}))
     with pytest.raises(ValueError, match="amount"):
         clean_dataframe(pd.DataFrame({"Date": ["2026-01-01"], "Description": ["x"]}))
+
+
+# A review found ISO dates misread (2026-01-02 became 1 February) and rows
+# silently dropped, so totals were wrong before any analysis.
+@pytest.mark.parametrize("dates, expected", [
+    (["2026-01-02", "2026-01-13"], ["2026-01-02", "2026-01-13"]),   # ISO
+    (["01/06/2026", "2026-06-02"], ["2026-06-01", "2026-06-02"]),   # mixed in one file
+    (["02/01/2026", "13/01/2026"], ["2026-01-02", "2026-01-13"]),   # day-first (Indian banks)
+    (["01/02/2026", "01/13/2026"], ["2026-01-02", "2026-01-13"]),   # month-first, detected from 13
+    (["02 Jan 2026", "Jan 13, 2026"], ["2026-01-02", "2026-01-13"]),  # month names
+])
+def test_dates_are_read_correctly_and_no_row_is_lost(dates, expected):
+    out = clean_dataframe(pd.DataFrame({"Date": dates, "Description": ["Shop A", "Shop B"], "Amount": [100, 200]}))
+    assert [str(d.date()) for d in out["date"]] == expected
+    assert list(out["amount"]) == [100, 200]
+
+
+def test_rows_that_cannot_be_read_are_reported_not_silently_dropped():
+    raw = pd.DataFrame({"Date": ["2026-01-02", "not a date", "2026-01-05"],
+                        "Description": ["A", "B", "C"], "Amount": [100, 200, None]})
+    out = clean_dataframe(raw)
+    assert len(out) == 1
+    assert out.attrs["rejected"] == {"unreadable_date": [1], "missing_amount": [2]}
