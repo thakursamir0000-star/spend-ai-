@@ -159,7 +159,8 @@ def save_results(name, acc, macro_f1, table, extra):
     out_dir = PROJECT_ROOT / "eval" / "results"
     out_dir.mkdir(parents=True, exist_ok=True)
     table.to_csv(out_dir / f"baseline_{name}.csv", index=False)
-    summary = {"accuracy": round(acc, 4), "macro_f1": round(macro_f1, 4), **extra}
+    summary = {"accuracy": round(acc, 4), "macro_f1": round(macro_f1, 4),
+               "test_rows": int(table["support"].sum()), **extra}
     with open(out_dir / f"baseline_{name}_summary.json", "w") as f:
         json.dump(summary, f, indent=2)
 

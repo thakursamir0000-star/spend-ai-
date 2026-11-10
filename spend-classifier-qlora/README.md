@@ -8,8 +8,10 @@ local model), with accuracy, latency and cost.
 ## Results
 
 **Training: complete.** Qwen2.5-1.5B-Instruct with a rank-16 LoRA adapter, 4 epochs in
-4-bit QLoRA (settings in `train/config.yaml`); the adapter is in
-`outputs/qlora-transaction-classifier`.
+4-bit QLoRA (settings in `train/config.yaml`). There are two adapters (kept locally;
+`outputs/` is not in git): `outputs/qlora-transaction-classifier` (August 2026, original
+random split) and `outputs/qlora-transaction-classifier-merchant-split-nov2026`
+(November 2026 retrain on the merchant-held-out split).
 
 ### Known merchants, new statement formats
 
@@ -29,14 +31,34 @@ it handles merchants it has never seen.
 |---|---|---|
 | Rules only | 0.799 | 0.751 |
 | Rules + Groq LLM (`openai/gpt-oss-20b`) | **0.885** | **0.877** |
+| Fine-tuned Qwen2.5-1.5B + LoRA (merchant-split retrain, local) | 0.564 | 0.440 |
 
-Measured from the repo root with
-`python evaluate.py --with-llm --test-jsonl spend-classifier-qlora/data/test.jsonl` on the
-merchant-held-out test set: 776 rows from 10 merchants that never appear in training (one
-per category; small, so expect some variance between seeds and runs). The
-fine-tuned adapter isn't scored here: it was trained on the original split, which
-contains these merchants, so a fair unseen-merchant number needs a run on
-`--split merchant` (see [limitations](#honest-limitations)).
+The rules rows were measured from the repo root with
+`python evaluate.py --with-llm --test-jsonl spend-classifier-qlora/data/test.jsonl`, and the
+fine-tuned row with `python eval/eval_finetuned.py --adapter
+outputs/qlora-transaction-classifier-merchant-split-nov2026 --device cpu --name
+finetuned_merchant_split` (float32 on CPU, 2.2 s per transaction). The test set is 776 rows
+from 10 merchants that never appear in training, one per category, so each merchant moves
+accuracy by about 10 points.
+
+Per merchant, the fine-tuned model:
+
+| Merchant (label) | Accuracy | Most common answer |
+|---|---|---|
+| Local Cafe (Food & Dining), DMart (Groceries), Broadband Bill (Bills & Utilities), Dental Clinic (Healthcare) | 100% | the label |
+| Hotstar (Subscriptions) | 75% | Subscriptions |
+| Indian Oil (Transport) | 47% | Other |
+| Zomato Dining (Entertainment) | 0% | Food & Dining |
+| Local Store (Shopping) | 0% | Groceries |
+| Mutual Fund (Transfers) | 0% | Subscriptions |
+| ATM Fee (Other) | 0% | Transfers |
+
+**Reading it:** the adapter learned the statement formats (it is right on every format
+variant of the four merchants it gets right), but for merchants it has never seen it falls
+back to their everyday meaning, such as Zomato as food or a local store as groceries, where
+this dataset's labels follow their own conventions. The rules and the rules + LLM path
+encode those conventions, so they generalize better here; the fine-tuned model is the
+better choice only for known merchants (0.947 above).
 
 ### Evaluation audit
 
@@ -166,8 +188,15 @@ the standard `prepare_model_for_kbit_training` step with non-reentrant gradient
 checkpointing, and **stop at the first log (step 10) if `grad_norm` is 0**.
 
 The loss log of the first run wasn't kept (only the adapter was downloaded). The notebook
-and `train_qlora.py` now save `trainer_state.json` next to the adapter, so the next run's
+and `train_qlora.py` now save `trainer_state.json` next to the adapter, so a run's
 train / eval loss curve can be plotted from its `log_history`.
+
+**The November 2026 retrain worked.** With PEFT 0.20.0 and the fixes above, it learned from
+the first log (`grad_norm` 2.1 at step 10; train loss 3.27 to 0.30), and all 56 LoRA B
+matrices are non-zero. Validation loss was lowest around steps 200–250 (0.435–0.443) and
+then rose slowly to 0.477 by step 1,000 as the model over-fitted the training merchants, so
+the saved adapter is the best checkpoint by validation loss (step 250; checkpoints are
+saved every 250 steps). Its `trainer_state.json` holds the full loss history.
 
 ## Evaluation vs baseline (Phase 5)
 
@@ -176,7 +205,11 @@ python eval/eval_finetuned.py --adapter outputs/qlora-transaction-classifier
 ```
 
 Prints per-category P/R/F1, latency (ms/txn), and a side-by-side comparison table
-against `eval/results/baseline_*.json` (fill the table at the top of this README).
+against `eval/results/baseline_*.json` (fill the table at the top of this README); baselines
+scored on a different test set are left out of that table. `--name` sets the result-file
+prefix so one run doesn't overwrite another (the merchant-split run used
+`--name finetuned_merchant_split`). On CPU the model needs ~6.5 GB of RAM in float32;
+`--dtype bfloat16` halves that but is about 5x slower on CPUs without native bfloat16.
 Misclassifications land in `eval/results/finetuned_errors.csv` — check the ambiguous
 merchants the rule system struggled with (Rent Transfer, Zomato Dining, unknown UPI
 descriptions with blank merchant).
@@ -202,11 +235,11 @@ df = categorize_batch_compat(df, client, progress_callback=on_progress)
 
 ## Honest limitations
 
-- **Unseen-merchant accuracy of the fine-tuned model isn't measured yet.** The adapter
-  was trained before the merchant split existed. Rebuild the data with
-  `python train/build_dataset.py` (merchant split is the default), retrain in Colab and
-  run `eval/eval_finetuned.py` to get it; the rules + LLM result to compare against is
-  0.885.
+- **The fine-tuned model doesn't generalize to unseen merchants.** Retrained on the
+  merchant split, it scores 0.564 on 10 held-out merchants against 0.885 for rules + LLM:
+  it learns statement formats, not this dataset's labelling conventions for new merchants.
+  With 10 test merchants the number is coarse (about 10 points per merchant). Next steps:
+  more merchants per category in training, or route unknown merchants to the LLM.
 - **Small, synthetic-ish dataset.** The 1,417 "real" labels come from the bot's sample
   generator (ground-truth = the generator's merchant→category mapping), not from a
   human-labeled bank export. Real-world generalization to genuinely novel merchants is

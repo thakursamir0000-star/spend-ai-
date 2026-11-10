@@ -12,6 +12,8 @@ Optional:
     --base Qwen/Qwen2.5-1.5B-Instruct   (must match the training base)
     --limit 100                          (quick subset)
     --device cpu                         (slow but works without a GPU)
+    --name finetuned_merchant_split      (results file prefix; keeps earlier runs)
+    --dtype bfloat16                     (CPU: half the memory of the float32 default)
 """
 import argparse
 import json
@@ -73,6 +75,10 @@ def main():
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--device", default="auto")
+    parser.add_argument("--name", default="finetuned",
+                        help="prefix for the result files, so one run doesn't overwrite another")
+    parser.add_argument("--dtype", choices=["float32", "bfloat16"], default=None,
+                        help="CPU weights dtype; float32 needs ~6.5 GB RAM for the 1.5B model, bfloat16 ~3.1 GB")
     args = parser.parse_args()
 
     rows = [json.loads(line) for line in Path(args.test).read_text(encoding="utf-8").splitlines() if line.strip()]
@@ -87,7 +93,8 @@ def main():
     tokenizer.padding_side = "left"
 
     has_cuda = torch.cuda.is_available() and args.device != "cpu"
-    load_kwargs = dict(torch_dtype=torch.bfloat16 if has_cuda else torch.float32)
+    cpu_dtype = getattr(torch, args.dtype) if args.dtype else torch.float32
+    load_kwargs = dict(torch_dtype=torch.bfloat16 if has_cuda else cpu_dtype)
     if has_cuda:
         load_kwargs.update(
             quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
@@ -133,29 +140,39 @@ def main():
     print(table.to_string(index=False))
 
     RESULTS.mkdir(parents=True, exist_ok=True)
-    table.to_csv(RESULTS / "finetuned.csv", index=False)
+    table.to_csv(RESULTS / f"{args.name}.csv", index=False)
     errors = pd.DataFrame({"input": [r["input"] for r in rows],
                            "gold": gold, "pred": preds,
                            "correct": [g == p for g, p in zip(gold, preds)]})
-    errors[~errors["correct"]].to_csv(RESULTS / "finetuned_errors.csv", index=False)
+    errors[~errors["correct"]].to_csv(RESULTS / f"{args.name}_errors.csv", index=False)
 
     extra = {
         "accuracy": round(acc, 4), "macro_f1": round(macro_f1, 4),
         "latency_ms_per_txn": round(total_sec * 1000 / len(rows), 2),
         "device": "cuda" if has_cuda else "cpu",
+        "dtype": "4-bit nf4 + bfloat16" if has_cuda else str(cpu_dtype).replace("torch.", ""),
         "base_model": args.base, "adapter": args.adapter,
+        "test_set": args.test, "test_rows": len(rows),
     }
-    with open(RESULTS / "finetuned_summary.json", "w") as f:
+    with open(RESULTS / f"{args.name}_summary.json", "w") as f:
         json.dump(extra, f, indent=2)
     print(f"\nLatency: {extra['latency_ms_per_txn']} ms/txn on {extra['device']}")
 
     # ---- Comparison vs baseline ----
-    summary = {}
+    summary, skipped = {}, []
     for mode in ("rules", "groq"):
         p = RESULTS / f"baseline_{mode}_summary.json"
         if p.exists():
-            summary[mode] = json.loads(p.read_text())
-    if summary:
+            # Only compare baselines scored on this same test set.
+            baseline = json.loads(p.read_text())
+            if baseline.get("test_rows") == len(rows):
+                summary[mode] = baseline
+            else:
+                skipped.append(mode)
+    if skipped:
+        print(f"\nNot comparing with baseline_{'/'.join(skipped)}: not scored on this {len(rows)}-row test set. "
+              "Re-run eval/baseline_eval.py on it, or compare with evaluate.py --test-jsonl.")
+    if "rules" in summary:
         print("\n=== COMPARISON (same held-out test set) ===")
         rows_cmp = [
             ["Rules only", summary["rules"]["accuracy"], summary["rules"]["macro_f1"], "-", "-"],
@@ -169,7 +186,7 @@ def main():
                          f"{extra['latency_ms_per_txn']} ms/txn", "~$0 (local)"])
         print(pd.DataFrame(rows_cmp, columns=["Approach", "Accuracy", "Macro F1", "Latency", "Cost"]).to_string(index=False))
 
-    print("\nMisclassification examples: eval/results/finetuned_errors.csv")
+    print(f"\nMisclassification examples: eval/results/{args.name}_errors.csv")
 
 
 if __name__ == "__main__":
