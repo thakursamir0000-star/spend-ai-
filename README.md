@@ -13,7 +13,7 @@ A personal finance assistant that analyzes bank/UPI transaction data using LLMs.
 - **Anomaly detection** — category spend spikes (>50% and ≥₹500 above the 3-month average) and new recurring merchants, measured from the latest date in your data.
 - **Interactive dashboard** — spend / income / net metrics, category pie, monthly trend, category breakdown over time, top merchants.
 - **NL Q&A with receipts** — ask *"How much did I spend on food last quarter?"*; the answer comes with a "How this was computed" panel showing the exact filters and result.
-- **QLoRA fine-tuning** *(optional sub-project)* — a trained local Qwen2.5-1.5B + LoRA classifier for offline categorization: 0.947 accuracy on known merchants in messy statement formats (rules: 0.898). See [results](#qlora-fine-tuned-model-optional).
+- **QLoRA fine-tuning** *(optional sub-project)* — a trained local Qwen2.5-1.5B + LoRA classifier for offline categorization: 0.947 accuracy on known merchants in messy statement formats (rules: 0.898); retrained on a merchant-held-out split it scores 0.564 on unseen merchants, below rules + LLM (0.885). See [results](#qlora-fine-tuned-model-optional).
 
 ## Architecture
 
@@ -82,14 +82,16 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 
 The `spend-classifier-qlora/` sub-project fine-tunes **Qwen2.5-1.5B-Instruct** with 4-bit QLoRA for transaction categorization.
 
-**Training: complete** (rank-16 LoRA, 4 epochs, 4-bit QLoRA).
+**Training: complete** (rank-16 LoRA, 4 epochs, 4-bit QLoRA): the August adapter on the original split, and a November 2026 retrain on the merchant-held-out split.
 
 | Test set | Rules only | Rules + Groq LLM | Fine-tuned (local) |
 |---|---|---|---|
-| Known merchants, new statement formats (567 rows) | 0.898 | – | **0.947** (macro F1 0.928) |
-| Unseen merchants (776 rows) | 0.799 | **0.885** | not measured* |
+| Known merchants, new statement formats (567 rows) | 0.898 | – | **0.947** (macro F1 0.928)* |
+| Unseen merchants (776 rows, 10 merchants) | 0.799 | **0.885** | 0.564 (macro F1 0.440)† |
 
-\* The adapter was trained on the original random split, which includes the unseen-merchant test merchants, so scoring it there wouldn't be fair; `build_dataset.py` now produces a merchant-held-out split for the next training run. An evaluation audit also found that the original Groq baseline was sent the gold labels; that number is withdrawn. Details in [`spend-classifier-qlora/README.md`](spend-classifier-qlora/README.md).
+\* August adapter, trained on the original random split, so every test merchant also appeared in training.
+
+† November 2026 retrain on the merchant-held-out split. It gets 4 of the 10 unseen merchants fully right and 2 partly; the other 4 it reads by their everyday meaning where the dataset follows its own convention (Zomato Dining → Food & Dining, labelled Entertainment; Local Store → Groceries, labelled Shopping). The small model learns statement formats, not the labelling conventions for merchants it has never seen, so rules + LLM generalize better here. An evaluation audit also found that the original Groq baseline was sent the gold labels; that number is withdrawn. Details in [`spend-classifier-qlora/README.md`](spend-classifier-qlora/README.md).
 
 The deployed app uses the Groq path; switching to the local model requires the one-line swap described in the sub-project README.
 
