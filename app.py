@@ -1,13 +1,12 @@
 import logging
 import os
 
-import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 from anomaly_engine import detect_anomalies
 from categorizer import categorize_batch
-from data_cleaner import CREDIT, clean_dataframe, spend_only
+from data_cleaner import CREDIT, clean_dataframe, read_transactions_csv, spend_only
 from llm_client import make_client
 from query_engine import answer_question
 
@@ -61,11 +60,11 @@ with st.sidebar:
     uploaded = st.file_uploader("Choose a transaction CSV", type=["csv"], key="csv_uploader")
 
     if uploaded:
-        raw_df = pd.read_csv(uploaded)
+        raw_df = read_transactions_csv(uploaded)
         st.success(f"Loaded {len(raw_df)} rows from {uploaded.name}")
     elif os.path.exists(SAMPLE_CSV_PATH):
         st.info("No file uploaded. Using sample data.")
-        raw_df = pd.read_csv(SAMPLE_CSV_PATH)
+        raw_df = read_transactions_csv(SAMPLE_CSV_PATH)
         st.success(f"Loaded {len(raw_df)} rows from sample data")
     else:
         raw_df = None

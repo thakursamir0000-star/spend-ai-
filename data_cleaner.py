@@ -27,6 +27,16 @@ _DIRECTION_VALUES = {
 }
 
 
+def read_transactions_csv(source):
+    """Read an uploaded CSV (path or file-like) with every column kept as text.
+
+    pandas would otherwise turn "+1200" into the number 1200, dropping the "+" that
+    marks money received, and clean_dataframe would then count it as spending.
+    The cleaning step parses amounts and dates from the text itself.
+    """
+    return pd.read_csv(source, dtype=str)
+
+
 def _find_column(df, keywords, substrings=None, exclude=()):
     cols_lower = {c: str(c).lower().strip() for c in df.columns if c not in exclude}
     for col, lower in cols_lower.items():
