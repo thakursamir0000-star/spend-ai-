@@ -9,6 +9,7 @@ import re
 
 import pandas as pd
 
+from categorizer import CATEGORIES
 from data_cleaner import DEBIT
 from llm_client import chat, chat_json
 from privacy import Pseudonymizer
@@ -19,6 +20,9 @@ AGGREGATIONS = {"sum": "sum", "count": "count", "average": "mean", "max": "max",
 GROUPABLE_FIELDS = {"month", "category", "merchant"}
 MAX_LIST_ROWS = 20
 MAX_GROUPS = 15
+# Categories a question can name outright. "Other" is an everyday word ("other expenses"),
+# so it is left out; income questions use the direction filter, and Income isn't in CATEGORIES.
+NAMEABLE_CATEGORIES = [c for c in CATEGORIES if c != "Other"]
 
 SYSTEM_PROMPT = """You are a financial data analyst. Parse the user's natural language question about their transaction data into a structured query.
 
@@ -129,7 +133,32 @@ def _parse_question(question, df, client, pseudo):
     for f in parsed["filters"]:
         if isinstance(f, dict) and "value" in f:
             f["value"] = _unmask_value(f["value"], pseudo)
-    return parsed
+    return _add_named_category(parsed, question)
+
+
+def named_categories(question):
+    text = question.lower()
+    return [c for c in NAMEABLE_CATEGORIES if re.search(rf"\b{re.escape(c.lower())}\b", text)]
+
+
+def _add_named_category(query, question):
+    """Add the category filter the model dropped.
+
+    The model sometimes returns no filter for a category the question names: "Break down
+    my Shopping spend by month" came back as all spending per month in every run, and
+    "average Transport transaction" once as the average of everything. When the question
+    names exactly one category and the query has no category filter (and isn't grouped by
+    category or a comparison), the filter is added and marked, so the "How this was
+    computed" panel shows it.
+    """
+    named = named_categories(question)
+    filters = query["filters"]
+    if (len(named) != 1 or query.get("group_by") == "category" or query.get("question_type") == "comparison"
+            or any(isinstance(f, dict) and f.get("field") == "category" for f in filters)):
+        return query
+    logger.info("Adding the category filter %r named in the question", named[0])
+    filters.append({"field": "category", "operator": "eq", "value": named[0], "added": "named in the question"})
+    return query
 
 
 def _text_mask(column, op, value):

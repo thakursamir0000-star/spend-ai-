@@ -1,7 +1,8 @@
 """Measure the bot end to end and print a results table for the README.
 
     python evaluate.py              # offline: rules-only categorization accuracy
-    python evaluate.py --with-llm   # + LLM categorization and NL Q&A accuracy (needs GROQ_API_KEY)
+    python evaluate.py --with-llm   # + LLM categorization and NL Q&A accuracy
+                                    #   (needs GROQ_API_KEY or OPENROUTER_API_KEY; LLM_PROVIDER picks one)
 
 Categorization: hide the sample data's Category column, run the real pipeline,
 compare with the hidden labels. Optionally also score a bank-style JSONL test
@@ -143,12 +144,13 @@ def score_qa(df, client):
 
 
 def get_client():
-    from groq import Groq
+    from llm_client import make_client, provider_name
 
-    key = os.environ.get("GROQ_API_KEY")
-    if not key:
-        raise SystemExit("--with-llm needs GROQ_API_KEY in the environment.")
-    return Groq(api_key=key)
+    client = make_client()
+    if client is None:
+        raise SystemExit("--with-llm needs GROQ_API_KEY or OPENROUTER_API_KEY in the environment.")
+    print(f"LLM provider: {provider_name()}")
+    return client
 
 
 def main():
@@ -160,6 +162,10 @@ def main():
     client = get_client() if args.with_llm else None
     sample = pd.read_csv(SAMPLE_CSV)
     report = {"categorization": {}}
+    if client:
+        from llm_client import provider_name
+
+        report["llm_provider"] = provider_name()
 
     hidden = sample.drop(columns=["Category"])
     report["categorization"]["sample_rules"] = score_categorization(hidden, sample["Category"], None)

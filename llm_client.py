@@ -1,10 +1,15 @@
-"""Shared Groq chat helper with ordered model failover.
+"""Shared LLM chat helper (Groq or OpenRouter) with ordered model failover.
 
 Every LLM call in the app goes through here, so the failover order lives in one
 place and a failing model is logged instead of silently skipped. A model the
-API reports as missing (404) is skipped for the rest of the process, and one
+API reports as missing is skipped for the rest of the process, and one
 rate-limited for longer than the SDK waits (a daily cap) is skipped until the
 limit resets.
+
+Providers (LLM_PROVIDER): "groq" (GROQ_API_KEY, free tier with daily limits) or
+"openrouter" (OPENROUTER_API_KEY, paid, no daily cap). The model names are the
+same on both. Without LLM_PROVIDER, Groq is used when its key is set, otherwise
+OpenRouter.
 """
 import json
 import logging
@@ -19,12 +24,65 @@ DEFAULT_FALLBACK_MODELS = [
     "qwen/qwen3.8-27b",
 ]
 
-# The Groq SDK already retries a 429 after the server's retry-after when that is
-# at most 60 s; a longer wait means a per-day limit, not a busy minute.
+# The Groq and OpenAI SDKs already retry a 429 after the server's retry-after when
+# that is at most 60 s; a longer wait means a per-day limit, not a busy minute.
 SDK_MAX_RETRY_AFTER = 60
+
+PROVIDER_KEYS = {"groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+# OpenRouter sends each request to one of many hosts. Transaction text should only
+# go to hosts that don't store or train on prompts, and Google Vertex is skipped:
+# on 2026-11-15 it returned broken JSON ('{"final{' and blank lines) for
+# gpt-oss-120b in JSON mode, while the other hosts we tried were fine. Groq's host
+# is tried first (others take over if it fails): in the 2026-11-15 evaluation it was
+# as accurate as the default mix but about twice as fast, and cheaper per run because
+# its JSON answers use fewer tokens.
+OPENROUTER_ROUTING = {"order": ["groq"], "data_collection": "deny", "ignore": ["google-vertex"]}
 
 _unavailable_models = set()
 _rate_limited_until = {}
+
+
+def _setting(name, secrets=None):
+    """A setting from the environment, else from `secrets(name)` (e.g. Streamlit secrets)."""
+    value = os.environ.get(name, "")
+    if not value and secrets is not None:
+        try:
+            value = secrets(name) or ""
+        except Exception:
+            value = ""
+    return str(value).strip().strip('"').strip("'")
+
+
+def provider_name(secrets=None):
+    """The LLM provider to use: LLM_PROVIDER if set, else whichever key is configured."""
+    choice = _setting("LLM_PROVIDER", secrets).lower()
+    if choice:
+        if choice not in PROVIDER_KEYS:
+            raise ValueError(f"LLM_PROVIDER must be one of {', '.join(PROVIDER_KEYS)}, not {choice!r}")
+        return choice
+    if not _setting("GROQ_API_KEY", secrets) and _setting("OPENROUTER_API_KEY", secrets):
+        return "openrouter"
+    return "groq"
+
+
+def make_client(secrets=None):
+    """A chat client for the chosen provider, or None when its API key is missing."""
+    provider = provider_name(secrets)
+    api_key = _setting(PROVIDER_KEYS[provider], secrets)
+    if not api_key:
+        return None
+    if provider == "openrouter":
+        from openai import OpenAI
+
+        return OpenAI(api_key=api_key, base_url=OPENROUTER_BASE_URL, timeout=60, max_retries=2)
+    from groq import Groq
+
+    return Groq(api_key=api_key)
+
+
+def is_openrouter(client):
+    return "openrouter.ai" in str(getattr(client, "base_url", ""))
 
 
 def _is_available(model):
@@ -49,7 +107,9 @@ def candidate_models(primary_env=None):
 
 
 def _is_missing_model(error):
-    return getattr(error, "status_code", None) == 404 or "model_not_found" in str(error)
+    # Groq: 404 / model_not_found. OpenRouter: 400 "<model> is not a valid model ID".
+    return (getattr(error, "status_code", None) == 404 or "model_not_found" in str(error)
+            or "not a valid model ID" in str(error))
 
 
 def _retry_after(error):
@@ -84,9 +144,16 @@ def _create(client, model, prompt, temperature, json_mode):
     }
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
-    if model.startswith("openai/gpt-oss"):
-        # Reasoning tokens share the output budget; keep them short so the
-        # answer itself (often a long JSON list) isn't cut off.
+    # Reasoning tokens share the output budget; keep them short on gpt-oss so the
+    # answer itself (often a long JSON list) isn't cut off.
+    low_reasoning = model.startswith("openai/gpt-oss")
+    if is_openrouter(client):
+        # require_parameters: only hosts that support JSON mode get JSON requests.
+        extra = {"provider": {**OPENROUTER_ROUTING, "require_parameters": json_mode}}
+        if low_reasoning:
+            extra["reasoning"] = {"effort": "low"}
+        kwargs["extra_body"] = extra
+    elif low_reasoning:
         kwargs["reasoning_effort"] = "low"
     completion = client.chat.completions.create(**kwargs)
     return completion.choices[0].message.content

@@ -111,6 +111,73 @@ def test_model_list_is_configurable(monkeypatch):
     assert candidate_models("GROQ_QA_MODEL") == ["my/model", "a/one", "b/two"]
 
 
+@pytest.fixture
+def no_llm_env(monkeypatch):
+    for var in ("LLM_PROVIDER", "GROQ_API_KEY", "OPENROUTER_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+    return monkeypatch
+
+
+def test_provider_follows_the_configured_key(no_llm_env):
+    assert llm_client.provider_name() == "groq"
+    no_llm_env.setenv("OPENROUTER_API_KEY", "sk-or-test")
+    assert llm_client.provider_name() == "openrouter"
+    no_llm_env.setenv("GROQ_API_KEY", "gsk-test")
+    assert llm_client.provider_name() == "groq"  # both keys: Groq unless LLM_PROVIDER says otherwise
+    no_llm_env.setenv("LLM_PROVIDER", "OpenRouter")
+    assert llm_client.provider_name() == "openrouter"
+    no_llm_env.setenv("LLM_PROVIDER", "nope")
+    with pytest.raises(ValueError, match="LLM_PROVIDER"):
+        llm_client.provider_name()
+
+
+def test_make_client_reads_streamlit_style_secrets(no_llm_env):
+    assert llm_client.make_client() is None
+    secrets = {"OPENROUTER_API_KEY": '"sk-or-test"'}
+    client = llm_client.make_client(secrets.get)
+    assert llm_client.is_openrouter(client)
+    assert client.api_key == "sk-or-test"
+    assert client.timeout == 60
+
+
+def openrouter_fake(fake_client, responder):
+    client = fake_client(responder)
+    client.base_url = "https://openrouter.ai/api/v1/"
+    return client
+
+
+def test_openrouter_requests_carry_routing_and_reasoning_in_the_body(fake_client, monkeypatch):
+    monkeypatch.setenv("GROQ_FALLBACK_MODELS", "qwen/qwen3.8-27b")
+    client = openrouter_fake(fake_client, lambda kwargs: RuntimeError("down") if "gpt-oss" in kwargs["model"] else "{}")
+    chat_json(client, "hi")
+    gpt_oss, qwen = client.calls
+    assert "reasoning_effort" not in gpt_oss  # Groq's parameter; OpenRouter takes `reasoning` in the body
+    assert gpt_oss["extra_body"]["reasoning"] == {"effort": "low"}
+    assert gpt_oss["extra_body"]["provider"] == {
+        "order": ["groq"], "data_collection": "deny", "ignore": ["google-vertex"], "require_parameters": True}
+    assert "allow_fallbacks" not in gpt_oss["extra_body"]["provider"]  # other hosts take over if Groq fails
+    assert "reasoning" not in qwen["extra_body"]
+
+    client = openrouter_fake(fake_client, lambda kwargs: "plain text")
+    chat(client, "hi")
+    assert client.calls[0]["extra_body"]["provider"]["require_parameters"] is False
+
+
+class InvalidModel(Exception):
+    status_code = 400
+
+
+def test_openrouter_unknown_model_is_skipped(fake_client):
+    def responder(kwargs):
+        if kwargs["model"] == "openai/gpt-oss-20b":
+            return InvalidModel("Error code: 400 - openai/gpt-oss-20b is not a valid model ID")
+        return "ok"
+
+    client = openrouter_fake(fake_client, responder)
+    assert chat(client, "first") == "ok"
+    assert "openai/gpt-oss-20b" not in candidate_models()
+
+
 @pytest.mark.parametrize("text, hidden, placeholder", [
     ("UPI/rahul.s@okicici/Payment", "rahul.s@okicici", "<UPI_ID>"),
     ("paid 9876543210 via UPI", "9876543210", "<PHONE>"),

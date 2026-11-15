@@ -4,11 +4,11 @@ import os
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from groq import Groq
 
 from anomaly_engine import detect_anomalies
 from categorizer import categorize_batch
 from data_cleaner import CREDIT, clean_dataframe, spend_only
+from llm_client import make_client
 from query_engine import answer_question
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -44,22 +44,15 @@ SOURCE_LABELS = {
 
 
 def get_client():
-    api_key = os.environ.get("GROQ_API_KEY", "")
-    if not api_key:
-        try:
-            api_key = st.secrets.get("GROQ_API_KEY", "")
-        except Exception:
-            api_key = ""
-    if not api_key:
-        return None
-    return Groq(api_key=api_key)
+    """Groq or OpenRouter client from environment variables or Streamlit secrets."""
+    return make_client(lambda name: st.secrets.get(name, ""))
 
 
 client = get_client()
 
 if not client:
-    st.warning("GROQ_API_KEY not found. Set it in environment variables or .streamlit/secrets.toml. "
-               "Categorization will use rules only and Q&A is disabled.")
+    st.warning("No LLM API key found. Set GROQ_API_KEY or OPENROUTER_API_KEY in environment variables "
+               "or .streamlit/secrets.toml. Categorization will use rules only and Q&A is disabled.")
 
 SAMPLE_CSV_PATH = "sample_transactions.csv"
 
@@ -125,7 +118,7 @@ with st.sidebar:
     st.markdown("""
     **AI Spend Insights Bot** analyzes your transaction data using LLMs.
 
-    - Auto-categorizes expenses (rules first, then Groq Cloud)
+    - Auto-categorizes expenses (rules first, then an LLM via Groq or OpenRouter)
     - Detects spending anomalies
     - Answers natural-language questions — numbers are computed in pandas, never by the LLM
 
@@ -277,6 +270,6 @@ with tab3:
             st.session_state.messages.append({"role": "assistant", "content": details["answer"], "details": details})
 
     elif df is not None and not df.empty and not client:
-        st.warning("GROQ API key not configured. Set GROQ_API_KEY to enable the Q&A feature.")
+        st.warning("LLM API key not configured. Set GROQ_API_KEY or OPENROUTER_API_KEY to enable the Q&A feature.")
     else:
         st.info("Upload and process data first.")

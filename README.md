@@ -25,7 +25,7 @@ flowchart LR
     K -->|file labels| E[existing]
     K -->|keyword rules| R[rules]
     K -->|seen before| CA[cache]
-    K -->|still unknown| M[privacy.mask_pii] --> L[llm_client<br/>Groq + failover]
+    K -->|still unknown| M[privacy.mask_pii] --> L[llm_client<br/>Groq or OpenRouter<br/>+ failover]
     K --> D[Dashboard]
     K --> A[anomaly_engine<br/>pandas, optional LLM wording]
     K --> Q[query_engine]
@@ -44,7 +44,7 @@ flowchart LR
 
 ## Evaluation
 
-Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm` (needs `GROQ_API_KEY`).
+Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm` (needs `GROQ_API_KEY` or `OPENROUTER_API_KEY`).
 
 | Evaluation | Rows | Rules only | Rules + LLM | Macro F1 (rules → + LLM) |
 |---|---|---|---|---|
@@ -56,15 +56,30 @@ Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm`
 
 Notes on the LLM run (29 Oct 2026, current code, Groq free tier, `openai/gpt-oss-20b`):
 - Three batches hit the free tier's 8,000 tokens-per-minute limit and were answered by the fallback `openai/gpt-oss-120b`; every row still got an LLM label.
-- **The Q&A miss is a model parsing error:** for *"Break down my Shopping spend by month"* the model returned a query with no category filter, so pandas summed all spending per month — and the phrased answer still called it "shopping". The **How this was computed** panel shows the empty filter list, which is how a user can catch it. A second run straight after answered it correctly (14/14): with temperature 0.1 answers vary between runs, and with 14 questions one answer moves the score by 7 points.
+- **The Q&A miss is a model parsing error:** for *"Break down my Shopping spend by month"* the model returned a query with no category filter, so pandas summed all spending per month — and the phrased answer still called it "shopping". The **How this was computed** panel shows the empty filter list, which is how a user can catch it. A second run straight after answered it correctly (14/14): with temperature 0.1 answers vary between runs, and with 14 questions one answer moves the score by 7 points. *Fixed since: see the OpenRouter runs below.*
 - **That second run's categorization numbers aren't reported:** `gpt-oss-20b` hit its daily token cap mid-run and the old Llama fallbacks returned 404 (Groq no longer offers them), so 83 of the 236 unseen-merchant rows got no LLM label and fell back to `Other`. That run is why the fallback chain was fixed (see [Rate limits](#models--llm-strategy)).
 - **Fallback check after the fix:** a third run started with both gpt-oss models at their daily caps. Each was detected and skipped, `qwen/qwen3.8-27b` took over, and Q&A scored 14/14. On the unseen-merchant set, though, qwen's free-tier limit of 1,000 output tokens per minute let only 110 of 236 rows through the parallel batches; the other 126 fell back to `Other` (accuracy 0.822). So once both gpt-oss daily caps are spent the app keeps answering, but a large statement is only partly labelled.
 - An earlier run found a bug in the evaluation itself: the ground truth for "last month" assumed the data ended in May, while it ends on 30 June. It is fixed and covered by a test.
 - 14 questions is a small set; it checks the parse → pandas → phrase path, not every phrasing a user might try.
 
+**The same models on OpenRouter** (15 Nov 2026, paid key, 5 full runs): every row got an LLM label in every run, so the daily-cap gap described above doesn't happen.
+
+| Evaluation | Groq free tier (29 Oct, 1 run) | OpenRouter, 4 runs before the fix below | OpenRouter, after the fix (1 run) |
+|---|---|---|---|
+| Sample data, rules + LLM accuracy | 0.974 | 0.965 – 0.972 | 0.974 |
+| Unseen merchants, rules + LLM accuracy | 0.885 | 0.831 – 0.861 | 0.849 |
+| NL Q&A | 13 / 14 | 12 – 13 / 14 | **14 / 14** |
+| Q&A median latency | 8.0 s | 1.3 s (Groq's host) – 2.3 s (other hosts) | 1.3 s |
+| Cost of one full evaluation run | free, but daily caps | about $0.003 – $0.005 | about $0.004 |
+
+- Accuracy on the unseen-merchant set moved by up to 0.03 between runs with identical settings, so part of the gap to the single Groq run may be noise; it wasn't re-measured on Groq this time.
+- OpenRouter tries Groq's own host first: it matched the other hosts on accuracy, answered about twice as fast and cost less per run (shorter JSON answers).
+- **Fix: a category the question names is no longer dropped.** The Shopping-by-month miss above happened in all four runs, and one run also dropped the category from *"What is my average Transport transaction amount?"*. Now, when a question names exactly one category and the parsed query has no category filter (and isn't grouped by category or a comparison), `query_engine` adds the filter and marks it `"added": "named in the question"`, so the **How this was computed** panel shows it. "Other" is left out because it's an ordinary word. In the run after the fix it fired on that one question only, and Q&A scored 14 / 14.
+- One default-routing run also filtered *"How much have I spent on Swiggy overall?"* by the Food & Dining category instead of the merchant; that is a different kind of parsing error and isn't covered by the fix.
+
 ## Models & LLM Strategy
 
-All LLM calls go through the **Groq SDK** with automatic failover:
+All LLM calls go through `llm_client.py`, on **Groq** (free tier, daily token caps) or **OpenRouter** (paid, no daily cap), with automatic failover. The model names are the same on both:
 
 | Priority | Model | Role |
 |---|---|---|
@@ -77,6 +92,8 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 > **Rate limits:** the Groq SDK already waits out a short 429 (it follows the server's `retry-after` up to 60 s, twice). A longer `retry-after` means a per-day token cap — on the free tier that is reached after a few full evaluation runs — so that model is skipped until the cap resets instead of being retried on every batch, and the next model in the chain takes over. Rows that no model labels fall back to `Other` and are counted in the sidebar.
 >
 > **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run. It happened again in October 2026, when Groq stopped offering `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`: the logs showed the 404s on the next evaluation run, and the chain now ends with `qwen/qwen3.8-27b`.
+>
+> **Providers:** `LLM_PROVIDER=groq` or `openrouter` picks one; without it, Groq is used when `GROQ_API_KEY` is set, otherwise OpenRouter. OpenRouter serves each model from many hosts, so requests set `data_collection: "deny"` (only hosts that don't store or train on prompts get transaction text), try Groq's host first (faster and cheaper per run in the evaluation; other hosts take over if it fails) and skip Google Vertex, which returned broken JSON for `gpt-oss-120b` in JSON mode when tested on 15 Nov 2026. JSON requests only go to hosts that support JSON mode. OpenRouter reports an unknown model as HTTP 400 ("not a valid model ID") rather than 404; both are treated as a missing model.
 
 ### QLoRA Fine-Tuned Model *(optional)*
 
@@ -100,15 +117,18 @@ The deployed app uses the Groq path; switching to the local model requires the o
 ```bash
 pip install -r requirements.txt
 
-# API key — environment variable or .streamlit/secrets.toml
+# API key — environment variable or .streamlit/secrets.toml (one of the two)
 set GROQ_API_KEY=gsk_...
+set OPENROUTER_API_KEY=sk-or-...
 
 streamlit run app.py
 ```
 
 Without an API key the app still runs: categorization uses rules only and Q&A is disabled.
 
-Optional settings: `MASK_PII=false` turns off masking (debugging only); `GROQ_*_MODEL` as above.
+Optional settings: `LLM_PROVIDER=groq|openrouter` when both keys are set; `MASK_PII=false` turns off masking (debugging only); `GROQ_*_MODEL` as above (the same model names work on OpenRouter).
+
+> **Public demo and a paid key:** anyone using a deployed app spends the key's credit. For a public deployment, give it a separate OpenRouter key with a credit limit (set in the OpenRouter dashboard), or keep the free Groq key.
 
 Or with Docker:
 
@@ -159,7 +179,7 @@ python generate_sample_data.py
 ├── categorizer.py              # Income → file labels → rules → cache → LLM
 ├── anomaly_engine.py           # Spike / new-merchant detection, optional LLM wording
 ├── query_engine.py             # Question → JSON query → pandas → answer
-├── llm_client.py               # Groq calls with logged model failover
+├── llm_client.py               # Groq / OpenRouter calls with logged model failover
 ├── privacy.py                  # PII masking before LLM calls
 ├── evaluate.py                 # Categorization + Q&A evaluation, prints README table
 ├── tests/                      # pytest suite (fake LLM client, no network)
@@ -179,7 +199,7 @@ python generate_sample_data.py
 - **Synthetic data** — sample transactions come from a generator, not real bank exports; the held-out evaluation uses only 10 unseen merchants.
 - **Masking is pattern-based** — it catches identifiers (UPI IDs, phone, account numbers), not personal names written as plain text.
 - **10 fixed spending categories, single label** per transaction.
-- **API dependency** — LLM categorization and Q&A need a Groq API key.
+- **API dependency** — LLM categorization and Q&A need a Groq or OpenRouter API key.
 
 ## License
 
