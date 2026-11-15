@@ -62,6 +62,20 @@ Notes on the LLM run (29 Oct 2026, current code, Groq free tier, `openai/gpt-oss
 - An earlier run found a bug in the evaluation itself: the ground truth for "last month" assumed the data ended in May, while it ends on 30 June. It is fixed and covered by a test.
 - 14 questions is a small set; it checks the parse → pandas → phrase path, not every phrasing a user might try.
 
+**The same models on OpenRouter** (15 Nov 2026, paid key, 4 full runs): every row got an LLM label in every run, so the daily-cap gap described above doesn't happen.
+
+| Evaluation | Groq free tier (29 Oct, 1 run) | OpenRouter (4 runs) |
+|---|---|---|
+| Sample data, rules + LLM accuracy | 0.974 | 0.965 – 0.972 |
+| Unseen merchants, rules + LLM accuracy | 0.885 | 0.831 – 0.861 |
+| NL Q&A | 13 / 14 | 12 – 13 / 14 (13 / 14 in both runs with Groq's host first) |
+| Q&A median latency | 8.0 s | 1.3 s (Groq's host) – 2.3 s (other hosts) |
+| Cost of one full evaluation run | free, but daily caps | about $0.003 – $0.005 |
+
+- Accuracy on the unseen-merchant set moved by up to 0.03 between runs with identical settings, so part of the gap to the single Groq run may be noise; it wasn't re-measured on Groq this time.
+- OpenRouter tries Groq's own host first: it matched the other hosts on accuracy, answered about twice as fast and cost less per run (shorter JSON answers).
+- The Shopping-by-month miss above happened in all four runs; two default-routing runs each missed one more question (Swiggy total filtered by category instead of merchant; average Transport transaction).
+
 ## Models & LLM Strategy
 
 All LLM calls go through `llm_client.py`, on **Groq** (free tier, daily token caps) or **OpenRouter** (paid, no daily cap), with automatic failover. The model names are the same on both:
@@ -78,7 +92,7 @@ All LLM calls go through `llm_client.py`, on **Groq** (free tier, daily token ca
 >
 > **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run. It happened again in October 2026, when Groq stopped offering `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`: the logs showed the 404s on the next evaluation run, and the chain now ends with `qwen/qwen3.8-27b`.
 >
-> **Providers:** `LLM_PROVIDER=groq` or `openrouter` picks one; without it, Groq is used when `GROQ_API_KEY` is set, otherwise OpenRouter. OpenRouter serves each model from many hosts, so requests set `data_collection: "deny"` (only hosts that don't store or train on prompts get transaction text) and skip Google Vertex, which returned broken JSON for `gpt-oss-120b` in JSON mode when tested on 15 Nov 2026. JSON requests only go to hosts that support JSON mode. OpenRouter reports an unknown model as HTTP 400 ("not a valid model ID") rather than 404; both are treated as a missing model.
+> **Providers:** `LLM_PROVIDER=groq` or `openrouter` picks one; without it, Groq is used when `GROQ_API_KEY` is set, otherwise OpenRouter. OpenRouter serves each model from many hosts, so requests set `data_collection: "deny"` (only hosts that don't store or train on prompts get transaction text), try Groq's host first (faster and cheaper per run in the evaluation; other hosts take over if it fails) and skip Google Vertex, which returned broken JSON for `gpt-oss-120b` in JSON mode when tested on 15 Nov 2026. JSON requests only go to hosts that support JSON mode. OpenRouter reports an unknown model as HTTP 400 ("not a valid model ID") rather than 404; both are treated as a missing model.
 
 ### QLoRA Fine-Tuned Model *(optional)*
 

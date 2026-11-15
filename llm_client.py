@@ -33,8 +33,11 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 # OpenRouter sends each request to one of many hosts. Transaction text should only
 # go to hosts that don't store or train on prompts, and Google Vertex is skipped:
 # on 2026-11-15 it returned broken JSON ('{"final{' and blank lines) for
-# gpt-oss-120b in JSON mode, while the other hosts we tried were fine.
-OPENROUTER_ROUTING = {"data_collection": "deny", "ignore": ["google-vertex"]}
+# gpt-oss-120b in JSON mode, while the other hosts we tried were fine. Groq's host
+# is tried first (others take over if it fails): in the 2026-11-15 evaluation it was
+# as accurate as the default mix but about twice as fast, and cheaper per run because
+# its JSON answers use fewer tokens.
+OPENROUTER_ROUTING = {"order": ["groq"], "data_collection": "deny", "ignore": ["google-vertex"]}
 
 _unavailable_models = set()
 _rate_limited_until = {}

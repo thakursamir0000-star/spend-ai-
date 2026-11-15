@@ -154,7 +154,8 @@ def test_openrouter_requests_carry_routing_and_reasoning_in_the_body(fake_client
     assert "reasoning_effort" not in gpt_oss  # Groq's parameter; OpenRouter takes `reasoning` in the body
     assert gpt_oss["extra_body"]["reasoning"] == {"effort": "low"}
     assert gpt_oss["extra_body"]["provider"] == {
-        "data_collection": "deny", "ignore": ["google-vertex"], "require_parameters": True}
+        "order": ["groq"], "data_collection": "deny", "ignore": ["google-vertex"], "require_parameters": True}
+    assert "allow_fallbacks" not in gpt_oss["extra_body"]["provider"]  # other hosts take over if Groq fails
     assert "reasoning" not in qwen["extra_body"]
 
     client = openrouter_fake(fake_client, lambda kwargs: "plain text")
