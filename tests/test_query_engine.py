@@ -3,7 +3,14 @@ import json
 import pandas as pd
 import pytest
 
-from query_engine import _execute_query, _fallback_answer, answer_question, calendar_dates, reference_date
+from query_engine import (
+    _execute_query,
+    _fallback_answer,
+    answer_question,
+    calendar_dates,
+    reference_date,
+    validate_query,
+)
 from tests.conftest import prompt_of
 
 
@@ -191,3 +198,70 @@ def test_last_quarter_is_the_previous_calendar_quarter():
 def test_ignored_filter_values_are_masked_before_phrasing(upi_txns):
     result = _execute_query(upi_txns, q([{"field": "city", "operator": "eq", "value": "near alice@okaxis"}]))
     assert "alice@okaxis" not in json.dumps(result)
+
+
+# ── Parsed-query validation: the model's JSON is checked before it runs ─────────────
+
+def ask(txns, fake_client, reply, question="How much did I spend?"):
+    """answer_question with a parser reply given as a raw JSON string; the phrasing call fails,
+    so the deterministic answer is used."""
+    client = fake_client(lambda kwargs: reply if kwargs.get("response_format") else RuntimeError("no phrasing"))
+    return answer_question(question, txns, client, return_details=True), client
+
+
+@pytest.mark.parametrize("reply", [
+    '{"aggregation": "sum"}',                       # seen from the model: no "filters" at all (was a KeyError)
+    '{"filters": null, "aggregation": "sum"}',
+    '{"filters": [], "aggregation": "sum", "group_by": null}',
+    '{"filters": []}',                              # no aggregation: sum, as before
+])
+def test_missing_or_empty_filters_mean_no_filter(txns, fake_client, reply):
+    details, _ = ask(txns, fake_client, reply)
+    assert details["query"]["filters"] == []
+    assert details["result"]["value"] == 2900.0  # all spending; the salary credit stays out
+    assert details["answer"] == "You spent ₹2,900 across 7 transaction(s) matching your criteria."
+
+
+@pytest.mark.parametrize("filters, value, count", [
+    ([{"field": "category", "operator": "eq", "value": "Transport"}], 1100.0, 2),
+    ([{"field": "merchant", "operator": "eq", "value": "swiggy"}], 500.0, 2),  # partial merchant match
+    ([{"field": "category", "value": "Food & Dining"}, {"field": "month", "operator": "eq", "value": "2026-02"}],
+     300.0, 1),                                     # a missing operator means "eq"
+    ([{"field": "merchant", "operator": None, "value": "Uber"}], 1100.0, 2),
+])
+def test_valid_category_and_merchant_filters_still_work(txns, fake_client, filters, value, count):
+    details, _ = ask(txns, fake_client, json.dumps({"filters": filters, "aggregation": "sum"}))
+    assert (details["result"]["value"], details["result"]["count"]) == (value, count)
+
+
+@pytest.mark.parametrize("reply", [
+    '[{"field": "category", "value": "Transport"}]',                              # not an object
+    '{"filters": "category = Transport", "aggregation": "sum"}',                  # filters not a list
+    '{"filters": {"field": "category", "value": "Transport"}, "aggregation": "sum"}',
+    '{"filters": ["Transport"], "aggregation": "sum"}',                           # filter not an object
+    '{"filters": [{"operator": "eq", "value": "Transport"}], "aggregation": "sum"}',   # no field
+    '{"filters": [{"field": "category", "operator": "eq"}], "aggregation": "sum"}',    # no value
+    '{"filters": [{"field": "category", "operator": "eq", "value": null}], "aggregation": "sum"}',
+    '{"filters": [{"field": "category", "operator": "between", "value": "Transport"}], "aggregation": "sum"}',
+    '{"filters": [], "aggregation": "median"}',
+    '{"filters": [], "aggregation": ["sum"]}',
+    '{"filters": [], "aggregation": "sum", "group_by": "week"}',
+    '{"filters": [], "aggregation": "sum", "group_by": ["month"]}',
+])
+def test_malformed_queries_are_not_run(txns, fake_client, reply):
+    details, client = ask(txns, fake_client, reply)
+    assert details["query"] is None and details["result"] is None
+    assert details["answer"].startswith("Sorry, I couldn't understand that question")
+    assert len(client.calls) == 1  # nothing was computed or phrased from the bad query
+
+
+def test_validate_query_fills_defaults_and_reports_problems():
+    query, problem = validate_query({"aggregation": "count", "group_by": "none", "question_type": "aggregation"})
+    assert problem is None
+    assert query == {"filters": [], "aggregation": "count", "group_by": None, "question_type": "aggregation"}
+    assert validate_query({"filters": [{"field": "category", "value": None}]}) == (
+        None, "the 'category' filter has no value")
+
+
+def test_execute_query_tolerates_null_filters(txns):
+    assert _execute_query(txns, {"filters": None, "aggregation": "sum"})["value"] == 2900.0

@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 AGGREGATIONS = {"sum": "sum", "count": "count", "average": "mean", "max": "max", "min": "min"}
 GROUPABLE_FIELDS = {"month", "category", "merchant"}
+OPERATORS = {"eq", "gte", "lte", "in", "contains"}
 MAX_LIST_ROWS = 20
 MAX_GROUPS = 15
 # Categories a question can name outright. "Other" is an everyday word ("other expenses"),
@@ -123,17 +124,54 @@ def _unmask_value(value, pseudo):
     return pseudo.unmask(value)
 
 
-def _parse_question(question, df, client, pseudo):
-    """`question` is already pseudonymized; filter values are restored locally."""
-    parsed = chat_json(client, _build_prompt(question, df), primary_env="GROQ_QA_MODEL", temperature=0.1)
+def validate_query(parsed):
+    """Check the model's query before it runs. Returns (query, None) or (None, reason).
+
+    Optional fields that are missing get the defaults the engine always used: no
+    `filters` (or null) means no filters, no `aggregation` means "sum", no `group_by`
+    means no grouping. A field that is present but malformed rejects the whole query:
+    running it without the part the model meant would give a confident wrong number.
+    Filters on fields the engine doesn't know are still run and reported as ignored.
+    """
     if not isinstance(parsed, dict):
+        return None, "the reply is not a JSON object"
+    filters = parsed.get("filters")
+    if filters is None:
+        filters = []
+    if not isinstance(filters, list):
+        return None, "filters is not a list"
+    for f in filters:
+        if not isinstance(f, dict) or not isinstance(f.get("field"), str) or not f["field"].strip():
+            return None, "a filter has no field name"
+        if f.get("value") is None:
+            return None, f"the {f['field']!r} filter has no value"
+        operator = f.get("operator") or "eq"
+        if not isinstance(operator, str) or operator not in OPERATORS:
+            return None, f"the {f['field']!r} filter has an unknown operator"
+    aggregation = parsed.get("aggregation") or "sum"
+    if not isinstance(aggregation, str) or (aggregation not in AGGREGATIONS and aggregation != "none"):
+        return None, "unknown aggregation"
+    group_by = parsed.get("group_by")
+    if group_by in (None, "", "none", "null"):
+        group_by = None
+    elif not isinstance(group_by, str) or group_by not in GROUPABLE_FIELDS:
+        return None, "unknown group_by"
+    return {**parsed, "filters": filters, "aggregation": aggregation, "group_by": group_by}, None
+
+
+def _parse_question(question, df, client, pseudo):
+    """`question` is already pseudonymized; filter values are restored locally.
+    Returns None when the model gave no usable query."""
+    parsed = chat_json(client, _build_prompt(question, df), primary_env="GROQ_QA_MODEL", temperature=0.1)
+    if parsed is None:
         return None
-    if not isinstance(parsed.get("filters", []), list):
-        parsed["filters"] = []
-    for f in parsed["filters"]:
-        if isinstance(f, dict) and "value" in f:
-            f["value"] = _unmask_value(f["value"], pseudo)
-    return _add_named_category(parsed, question)
+    query, problem = validate_query(parsed)
+    if problem:
+        logger.warning("Not running the model's query: %s", problem)
+        return None
+    for f in query["filters"]:
+        f["value"] = _unmask_value(f["value"], pseudo)
+    return _add_named_category(query, question)
 
 
 def named_categories(question):
@@ -209,7 +247,7 @@ def _execute_query(df, query, pseudo=None):
     """Run `query` on `df`. Merchant names in the result are pseudonymized with
     `pseudo` (numbered placeholders), since the result is sent to the LLM."""
     pseudo = pseudo or Pseudonymizer()
-    filters = [f for f in query.get("filters", []) if isinstance(f, dict) and f.get("value") is not None]
+    filters = [f for f in query.get("filters") or [] if isinstance(f, dict) and f.get("value") is not None]
     filtered = df
     if "direction" in df.columns and not any(f.get("field") == "direction" for f in filters):
         filtered = filtered[filtered["direction"] == DEBIT]
