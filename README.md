@@ -25,7 +25,7 @@ flowchart LR
     K -->|file labels| E[existing]
     K -->|keyword rules| R[rules]
     K -->|seen before| CA[cache]
-    K -->|still unknown| M[privacy.mask_pii] --> L[llm_client<br/>Groq + failover]
+    K -->|still unknown| M[privacy.mask_pii] --> L[llm_client<br/>Groq or OpenRouter<br/>+ failover]
     K --> D[Dashboard]
     K --> A[anomaly_engine<br/>pandas, optional LLM wording]
     K --> Q[query_engine]
@@ -44,7 +44,7 @@ flowchart LR
 
 ## Evaluation
 
-Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm` (needs `GROQ_API_KEY`).
+Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm` (needs `GROQ_API_KEY` or `OPENROUTER_API_KEY`).
 
 | Evaluation | Rows | Rules only | Rules + LLM | Macro F1 (rules → + LLM) |
 |---|---|---|---|---|
@@ -64,7 +64,7 @@ Notes on the LLM run (29 Oct 2026, current code, Groq free tier, `openai/gpt-oss
 
 ## Models & LLM Strategy
 
-All LLM calls go through the **Groq SDK** with automatic failover:
+All LLM calls go through `llm_client.py`, on **Groq** (free tier, daily token caps) or **OpenRouter** (paid, no daily cap), with automatic failover. The model names are the same on both:
 
 | Priority | Model | Role |
 |---|---|---|
@@ -77,6 +77,8 @@ All LLM calls go through the **Groq SDK** with automatic failover:
 > **Rate limits:** the Groq SDK already waits out a short 429 (it follows the server's `retry-after` up to 60 s, twice). A longer `retry-after` means a per-day token cap — on the free tier that is reached after a few full evaluation runs — so that model is skipped until the cap resets instead of being retried on every batch, and the next model in the chain takes over. Rows that no model labels fall back to `Other` and are counted in the sidebar.
 >
 > **Lesson learned:** the original fallbacks `qwen/qwen3.6-27b` and `groq/compound-mini` returned 404 on this account, but the old code swallowed errors, so they had silently never worked. Logging failures surfaced it on the first evaluation run. It happened again in October 2026, when Groq stopped offering `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`: the logs showed the 404s on the next evaluation run, and the chain now ends with `qwen/qwen3.8-27b`.
+>
+> **Providers:** `LLM_PROVIDER=groq` or `openrouter` picks one; without it, Groq is used when `GROQ_API_KEY` is set, otherwise OpenRouter. OpenRouter serves each model from many hosts, so requests set `data_collection: "deny"` (only hosts that don't store or train on prompts get transaction text) and skip Google Vertex, which returned broken JSON for `gpt-oss-120b` in JSON mode when tested on 15 Nov 2026. JSON requests only go to hosts that support JSON mode. OpenRouter reports an unknown model as HTTP 400 ("not a valid model ID") rather than 404; both are treated as a missing model.
 
 ### QLoRA Fine-Tuned Model *(optional)*
 
@@ -100,15 +102,18 @@ The deployed app uses the Groq path; switching to the local model requires the o
 ```bash
 pip install -r requirements.txt
 
-# API key — environment variable or .streamlit/secrets.toml
+# API key — environment variable or .streamlit/secrets.toml (one of the two)
 set GROQ_API_KEY=gsk_...
+set OPENROUTER_API_KEY=sk-or-...
 
 streamlit run app.py
 ```
 
 Without an API key the app still runs: categorization uses rules only and Q&A is disabled.
 
-Optional settings: `MASK_PII=false` turns off masking (debugging only); `GROQ_*_MODEL` as above.
+Optional settings: `LLM_PROVIDER=groq|openrouter` when both keys are set; `MASK_PII=false` turns off masking (debugging only); `GROQ_*_MODEL` as above (the same model names work on OpenRouter).
+
+> **Public demo and a paid key:** anyone using a deployed app spends the key's credit. For a public deployment, give it a separate OpenRouter key with a credit limit (set in the OpenRouter dashboard), or keep the free Groq key.
 
 Or with Docker:
 
@@ -159,7 +164,7 @@ python generate_sample_data.py
 ├── categorizer.py              # Income → file labels → rules → cache → LLM
 ├── anomaly_engine.py           # Spike / new-merchant detection, optional LLM wording
 ├── query_engine.py             # Question → JSON query → pandas → answer
-├── llm_client.py               # Groq calls with logged model failover
+├── llm_client.py               # Groq / OpenRouter calls with logged model failover
 ├── privacy.py                  # PII masking before LLM calls
 ├── evaluate.py                 # Categorization + Q&A evaluation, prints README table
 ├── tests/                      # pytest suite (fake LLM client, no network)
@@ -179,7 +184,7 @@ python generate_sample_data.py
 - **Synthetic data** — sample transactions come from a generator, not real bank exports; the held-out evaluation uses only 10 unseen merchants.
 - **Masking is pattern-based** — it catches identifiers (UPI IDs, phone, account numbers), not personal names written as plain text.
 - **10 fixed spending categories, single label** per transaction.
-- **API dependency** — LLM categorization and Q&A need a Groq API key.
+- **API dependency** — LLM categorization and Q&A need a Groq or OpenRouter API key.
 
 ## License
 
