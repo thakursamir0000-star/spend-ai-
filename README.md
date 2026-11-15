@@ -56,25 +56,26 @@ Reproduce with `python evaluate.py` (offline) or `python evaluate.py --with-llm`
 
 Notes on the LLM run (29 Oct 2026, current code, Groq free tier, `openai/gpt-oss-20b`):
 - Three batches hit the free tier's 8,000 tokens-per-minute limit and were answered by the fallback `openai/gpt-oss-120b`; every row still got an LLM label.
-- **The Q&A miss is a model parsing error:** for *"Break down my Shopping spend by month"* the model returned a query with no category filter, so pandas summed all spending per month — and the phrased answer still called it "shopping". The **How this was computed** panel shows the empty filter list, which is how a user can catch it. A second run straight after answered it correctly (14/14): with temperature 0.1 answers vary between runs, and with 14 questions one answer moves the score by 7 points.
+- **The Q&A miss is a model parsing error:** for *"Break down my Shopping spend by month"* the model returned a query with no category filter, so pandas summed all spending per month — and the phrased answer still called it "shopping". The **How this was computed** panel shows the empty filter list, which is how a user can catch it. A second run straight after answered it correctly (14/14): with temperature 0.1 answers vary between runs, and with 14 questions one answer moves the score by 7 points. *Fixed since: see the OpenRouter runs below.*
 - **That second run's categorization numbers aren't reported:** `gpt-oss-20b` hit its daily token cap mid-run and the old Llama fallbacks returned 404 (Groq no longer offers them), so 83 of the 236 unseen-merchant rows got no LLM label and fell back to `Other`. That run is why the fallback chain was fixed (see [Rate limits](#models--llm-strategy)).
 - **Fallback check after the fix:** a third run started with both gpt-oss models at their daily caps. Each was detected and skipped, `qwen/qwen3.8-27b` took over, and Q&A scored 14/14. On the unseen-merchant set, though, qwen's free-tier limit of 1,000 output tokens per minute let only 110 of 236 rows through the parallel batches; the other 126 fell back to `Other` (accuracy 0.822). So once both gpt-oss daily caps are spent the app keeps answering, but a large statement is only partly labelled.
 - An earlier run found a bug in the evaluation itself: the ground truth for "last month" assumed the data ended in May, while it ends on 30 June. It is fixed and covered by a test.
 - 14 questions is a small set; it checks the parse → pandas → phrase path, not every phrasing a user might try.
 
-**The same models on OpenRouter** (15 Nov 2026, paid key, 4 full runs): every row got an LLM label in every run, so the daily-cap gap described above doesn't happen.
+**The same models on OpenRouter** (15 Nov 2026, paid key, 5 full runs): every row got an LLM label in every run, so the daily-cap gap described above doesn't happen.
 
-| Evaluation | Groq free tier (29 Oct, 1 run) | OpenRouter (4 runs) |
-|---|---|---|
-| Sample data, rules + LLM accuracy | 0.974 | 0.965 – 0.972 |
-| Unseen merchants, rules + LLM accuracy | 0.885 | 0.831 – 0.861 |
-| NL Q&A | 13 / 14 | 12 – 13 / 14 (13 / 14 in both runs with Groq's host first) |
-| Q&A median latency | 8.0 s | 1.3 s (Groq's host) – 2.3 s (other hosts) |
-| Cost of one full evaluation run | free, but daily caps | about $0.003 – $0.005 |
+| Evaluation | Groq free tier (29 Oct, 1 run) | OpenRouter, 4 runs before the fix below | OpenRouter, after the fix (1 run) |
+|---|---|---|---|
+| Sample data, rules + LLM accuracy | 0.974 | 0.965 – 0.972 | 0.974 |
+| Unseen merchants, rules + LLM accuracy | 0.885 | 0.831 – 0.861 | 0.849 |
+| NL Q&A | 13 / 14 | 12 – 13 / 14 | **14 / 14** |
+| Q&A median latency | 8.0 s | 1.3 s (Groq's host) – 2.3 s (other hosts) | 1.3 s |
+| Cost of one full evaluation run | free, but daily caps | about $0.003 – $0.005 | about $0.004 |
 
 - Accuracy on the unseen-merchant set moved by up to 0.03 between runs with identical settings, so part of the gap to the single Groq run may be noise; it wasn't re-measured on Groq this time.
 - OpenRouter tries Groq's own host first: it matched the other hosts on accuracy, answered about twice as fast and cost less per run (shorter JSON answers).
-- The Shopping-by-month miss above happened in all four runs; two default-routing runs each missed one more question (Swiggy total filtered by category instead of merchant; average Transport transaction).
+- **Fix: a category the question names is no longer dropped.** The Shopping-by-month miss above happened in all four runs, and one run also dropped the category from *"What is my average Transport transaction amount?"*. Now, when a question names exactly one category and the parsed query has no category filter (and isn't grouped by category or a comparison), `query_engine` adds the filter and marks it `"added": "named in the question"`, so the **How this was computed** panel shows it. "Other" is left out because it's an ordinary word. In the run after the fix it fired on that one question only, and Q&A scored 14 / 14.
+- One default-routing run also filtered *"How much have I spent on Swiggy overall?"* by the Food & Dining category instead of the merchant; that is a different kind of parsing error and isn't covered by the fix.
 
 ## Models & LLM Strategy
 

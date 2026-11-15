@@ -109,6 +109,34 @@ def test_unparseable_question(txns, fake_client):
     assert answer.startswith("Sorry")
 
 
+def parsed_as(query):
+    def responder(kwargs):
+        return json.dumps(query) if kwargs.get("response_format") else RuntimeError("phrasing skipped")
+    return responder
+
+
+def test_category_named_in_the_question_is_added_when_the_model_drops_it(txns, fake_client):
+    # Seen with gpt-oss-20b: "Break down my Shopping spend by month" parsed with no category filter.
+    client = fake_client(parsed_as(q(group_by="month")))
+    details = answer_question("Break down my Shopping spend by month.", txns, client, return_details=True)
+    assert details["query"]["filters"] == [
+        {"field": "category", "operator": "eq", "value": "Shopping", "added": "named in the question"}]
+    assert details["result"]["grouped"] == {"2026-01": 1000.0, "2026-06": 50.0}
+
+
+@pytest.mark.parametrize("question, query", [
+    ("How much did I spend on Transport?",  # the model's own filter wins
+     q([{"field": "category", "operator": "eq", "value": "Transport"}])),
+    ("Compare Shopping and Transport", q(group_by="category")),  # two categories named
+    ("Show my Shopping spend per category", q(group_by="category")),  # grouped by category
+    ("How much did I spend on other things?", q()),  # "other" is an ordinary word here
+    ("How much did I spend last month?", q([{"field": "month", "operator": "eq", "value": "2026-05"}])),
+])
+def test_named_category_is_left_alone_when_it_should_be(txns, fake_client, question, query):
+    details = answer_question(question, txns, fake_client(parsed_as(query)), return_details=True)
+    assert details["query"]["filters"] == query["filters"]
+
+
 @pytest.mark.parametrize("result, expected", [
     ({"value": 3, "aggregation": "count", "count": 3}, "There were 3 transaction(s)"),
     ({"value": 120.0, "aggregation": "average", "count": 3}, "average transaction amount is ₹120"),
